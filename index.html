@@ -49,6 +49,7 @@
       transition: all 0.3s ease;
       background: #f8fafc;
       overflow: hidden;
+      position: relative;
     }
 
     #input-preview {
@@ -70,6 +71,8 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
+      transform-origin: center;
+      transition: transform 0.2s ease;
     }
 
     .buttons {
@@ -132,6 +135,32 @@
     const outputPreview = document.getElementById('output-preview');
     const fileInput = document.getElementById('file-input');
     let currentFileName = null;
+    let scale = 1;
+    let isDragging = false;
+    let startX, startY, initialX, initialY;
+
+    // Zoom functionality
+    function handleWheel(e) {
+      e.preventDefault();
+      const delta = Math.sign(e.deltaY) * -0.1;
+      const newScale = Math.min(Math.max(scale + delta, 1), 5);
+      
+      if (newScale !== scale) {
+        scale = newScale;
+        const inputImg = inputPreview.querySelector('img');
+        const outputImg = outputPreview.querySelector('img');
+        
+        if (inputImg) {
+          inputImg.style.transform = `scale(${scale})`;
+        }
+        if (outputImg) {
+          outputImg.style.transform = `scale(${scale})`;
+        }
+      }
+    }
+
+    inputPreview.addEventListener('wheel', handleWheel);
+    outputPreview.addEventListener('wheel', handleWheel);
 
     inputPreview.addEventListener('dragover', (event) => {
       event.preventDefault();
