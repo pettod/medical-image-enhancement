@@ -61,8 +61,8 @@
   <div style="display: flex; gap: 20px; margin-bottom: 20px;">
     <div>
       <h3>Input Image</h3>
-      <div id="input-preview" style="width: 300px; height: 300px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center;">
-        No image uploaded
+      <div id="input-preview" style="width: 300px; height: 300px; border: 2px dashed #ccc; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #aaa; transition: background-color 0.3s;">
+        Drag and drop files here
       </div>
     </div>
 
@@ -74,10 +74,6 @@
     </div>
   </div>
 
-  <div class="dropzone" id="dropzone">
-    Drag and drop files here
-  </div>
-
   <div class="buttons">
     <button onclick="buttonClick('Denoise')">Denoise</button>
     <button onclick="buttonClick('Deblur')">Deblur</button>
@@ -86,23 +82,25 @@
   </div>
 
   <script>
-    const dropzone = document.getElementById('dropzone');
     const inputPreview = document.getElementById('input-preview');
     const outputPreview = document.getElementById('output-preview');
     let currentFileName = null;
 
-    dropzone.addEventListener('dragover', (event) => {
+    inputPreview.addEventListener('dragover', (event) => {
       event.preventDefault();
-      dropzone.classList.add('dragover');
+      inputPreview.style.backgroundColor = '#e0e0e0';
+      inputPreview.style.borderColor = '#888';
     });
 
-    dropzone.addEventListener('dragleave', () => {
-      dropzone.classList.remove('dragover');
+    inputPreview.addEventListener('dragleave', () => {
+      inputPreview.style.backgroundColor = '';
+      inputPreview.style.borderColor = '#ccc';
     });
 
-    dropzone.addEventListener('drop', (event) => {
+    inputPreview.addEventListener('drop', (event) => {
       event.preventDefault();
-      dropzone.classList.remove('dragover');
+      inputPreview.style.backgroundColor = '';
+      inputPreview.style.borderColor = '#ccc';
 
       const files = event.dataTransfer.files;
       if (files.length > 0) {
@@ -117,7 +115,7 @@
         
         // Store filename and update dropzone text
         currentFileName = file.name;
-        dropzone.textContent = currentFileName;
+        inputPreview.textContent = currentFileName;
 
         // Display image preview
         const reader = new FileReader();
@@ -140,9 +138,9 @@
           console.error('Error:', error);
           alert('An error occurred during the upload.');
           // Reset dropzone text, filename and preview on error
-          dropzone.textContent = 'Drag and drop files here';
+          inputPreview.textContent = 'Drag and drop files here';
           currentFileName = null;
-          inputPreview.innerHTML = 'No image uploaded';
+          inputPreview.innerHTML = 'Drag and drop files here';
           outputPreview.innerHTML = 'No output yet';
         });
       }
