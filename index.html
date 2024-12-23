@@ -164,13 +164,15 @@
           file_name: currentFileName
         })
       })
-      .then(response => response.json())
-      .then(data => {
-        // Reset dropzone text after successful button click
-        dropzone.textContent = 'Drag and drop files here';
-        currentFileName = null;
-        inputPreview.innerHTML = 'No image uploaded';
-        outputPreview.innerHTML = 'No output yet';
+      .then(response => response.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        outputPreview.innerHTML = '';
+        outputPreview.appendChild(img);
       })
       .catch(error => {
         console.error('Error:', error);

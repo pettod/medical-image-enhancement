@@ -1,5 +1,6 @@
 from bottle import Bottle, request, static_file
 import os
+from PIL import Image
 
 app = Bottle()
 
@@ -26,10 +27,21 @@ def handle_button():
     data = request.json
     button_name = data.get('button_name')
     file_name = data.get('file_name')
-    
+
+    print(button_name)
     if file_name and os.path.exists(f"uploads/{file_name}"):
-        os.remove(f"uploads/{file_name}")
-        return {"message": f"File {file_name} deleted after {button_name} operation"}
+        # Open and rotate the image
+        img_path = f"uploads/{file_name}"
+        with Image.open(img_path) as img:
+            # Rotate 90 degrees clockwise
+            rotated = img.rotate(-90, expand=True)
+            # Save rotated image
+            rotated.save(img_path)
+            
+        # Return the rotated image
+        response = static_file(file_name, root='uploads', mimetype='image/jpeg')
+        #os.remove(f"uploads/{file_name}")
+        return response
     else:
         return {"message": f"File not found"}
 
