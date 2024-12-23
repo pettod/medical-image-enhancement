@@ -69,8 +69,11 @@
     <button onclick="buttonClick('Segment')">Segment</button>
   </div>
 
+  <img id="preview" style="max-width: 300px; max-height: 300px; margin-top: 20px; display: none;">
+
   <script>
     const dropzone = document.getElementById('dropzone');
+    const preview = document.getElementById('preview');
     let currentFileName = null;
 
     dropzone.addEventListener('dragover', (event) => {
@@ -88,12 +91,26 @@
 
       const files = event.dataTransfer.files;
       if (files.length > 0) {
+        const file = files[0];
+        if (!file.type.startsWith('image/')) {
+          alert('Please upload an image file');
+          return;
+        }
+
         const formData = new FormData();
-        formData.append('file', files[0]);
+        formData.append('file', file);
         
         // Store filename and update dropzone text
-        currentFileName = files[0].name;
+        currentFileName = file.name;
         dropzone.textContent = currentFileName;
+
+        // Display image preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
 
         fetch('/upload', {
           method: 'POST',
@@ -106,9 +123,10 @@
         .catch(error => {
           console.error('Error:', error);
           alert('An error occurred during the upload.');
-          // Reset dropzone text and filename on error
+          // Reset dropzone text, filename and preview on error
           dropzone.textContent = 'Drag and drop files here';
           currentFileName = null;
+          preview.style.display = 'none';
         });
       }
     });
