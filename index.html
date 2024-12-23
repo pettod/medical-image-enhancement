@@ -106,14 +106,15 @@
     <div class="preview-container">
       <div class="preview-box">
         <h3>Input Image</h3>
-        <div id="input-preview" class="preview">
+        <div id="input-preview" class="preview" onclick="document.getElementById('file-input').click()">
           Drag and drop image here
         </div>
+        <input type="file" id="file-input" accept="image/*" style="display: none">
       </div>
 
       <div class="preview-box">
         <h3>Output Image</h3>
-        <div id="output-preview" class="preview" style="border: 3px solid #cbd5e0;">
+        <div id="output-preview" class="preview" style="border: 3px solid #cbd5e0; background: white;">
           No output yet
         </div>
       </div>
@@ -129,6 +130,7 @@
   <script>
     const inputPreview = document.getElementById('input-preview');
     const outputPreview = document.getElementById('output-preview');
+    const fileInput = document.getElementById('file-input');
     let currentFileName = null;
 
     inputPreview.addEventListener('dragover', (event) => {
@@ -140,46 +142,54 @@
       inputPreview.classList.remove('dragover');
     });
 
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      handleFile(file);
+    });
+
     inputPreview.addEventListener('drop', (event) => {
       event.preventDefault();
       inputPreview.classList.remove('dragover');
 
       const files = event.dataTransfer.files;
       if (files.length > 0) {
-        const file = files[0];
-        if (!file.type.startsWith('image/')) {
-          alert('Please upload an image file');
-          return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        currentFileName = file.name;
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          inputPreview.innerHTML = '';
-          inputPreview.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-
-        fetch('/upload', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json())
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred during the upload.');
-          inputPreview.innerHTML = 'Drag and drop image here';
-          currentFileName = null;
-          outputPreview.innerHTML = 'No output yet';
-        });
+        handleFile(files[0]);
       }
     });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      currentFileName = file.name;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        inputPreview.innerHTML = '';
+        inputPreview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred during the upload.');
+        inputPreview.innerHTML = 'Drag and drop image here';
+        currentFileName = null;
+        outputPreview.innerHTML = 'No output yet';
+      });
+    }
 
     function buttonClick(buttonName) {
       if (!currentFileName) {
