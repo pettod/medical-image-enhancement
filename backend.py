@@ -25,8 +25,13 @@ def handle_upload():
 def handle_button():
     data = request.json
     button_name = data.get('button_name')
-    print(data)
-    return {"message": f"Button {button_name} clicked"}
+    file_name = data.get('file_name')
+    
+    if file_name and os.path.exists(f"uploads/{file_name}"):
+        os.remove(f"uploads/{file_name}")
+        return {"message": f"File {file_name} deleted after {button_name} operation"}
+    else:
+        return {"message": f"File not found"}
 
 # Create uploads directory if it doesn't exist
 if not os.path.exists('uploads'):
