@@ -33,11 +33,21 @@ def handle_button():
 
     print(button_name)
     if file_name and os.path.exists(f"uploads/{file_name}"):
+        rotation = 0
+        if button_name == "Denoise":
+            rotation = 90
+        elif button_name == "Deblur":
+            rotation = 180
+        elif button_name == "Super Resolve":
+            rotation = -90
+        elif button_name == "Segment":
+            rotation = -90
+
         # Open and rotate the image
         img_path = f"uploads/{file_name}"
         with Image.open(img_path) as img:
             # Rotate 90 degrees clockwise
-            rotated = img.rotate(-90, expand=True)
+            rotated = img.rotate(rotation, expand=True)
             # Save rotated image
             rotated.save(img_path)
             
