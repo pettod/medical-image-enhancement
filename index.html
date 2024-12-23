@@ -71,6 +71,7 @@
 
   <script>
     const dropzone = document.getElementById('dropzone');
+    let currentFileName = null;
 
     dropzone.addEventListener('dragover', (event) => {
       event.preventDefault();
@@ -89,6 +90,10 @@
       if (files.length > 0) {
         const formData = new FormData();
         formData.append('file', files[0]);
+        
+        // Store filename and update dropzone text
+        currentFileName = files[0].name;
+        dropzone.textContent = currentFileName;
 
         fetch('/upload', {
           method: 'POST',
@@ -101,17 +106,28 @@
         .catch(error => {
           console.error('Error:', error);
           alert('An error occurred during the upload.');
+          // Reset dropzone text and filename on error
+          dropzone.textContent = 'Drag and drop files here';
+          currentFileName = null;
         });
       }
     });
 
     function buttonClick(buttonName) {
+      if (!currentFileName) {
+        alert('Please upload an image first');
+        return;
+      }
+
       fetch('/button-click', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ button_name: buttonName })
+        body: JSON.stringify({ 
+          button_name: buttonName,
+          file_name: currentFileName
+        })
       })
       .then(response => response.json())
       .then(data => {
