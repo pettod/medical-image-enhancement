@@ -137,39 +137,39 @@
 
     let currentFileName = null;
 
-    // Transformation state for input and output images
-    const transforms = {
-      input: {
-        scale: 1,
-        translateX: 0,
-        translateY: 0,
-        isDragging: false,
-        startX: 0,
-        startY: 0
-      },
-      output: {
-        scale: 1,
-        translateX: 0,
-        translateY: 0,
-        isDragging: false,
-        startX: 0,
-        startY: 0
-      }
+    // Shared Transformation state for both images
+    const transform = {
+      scale: 1,
+      translateX: 0,
+      translateY: 0,
+      isDragging: false,
+      startX: 0,
+      startY: 0
     };
 
-    // Helper function to apply transformations
-    function applyTransform(img, type) {
-      const t = transforms[type];
-      img.style.transform = `scale(${t.scale}) translate(${t.translateX}px, ${t.translateY}px)`;
-      img.style.transformOrigin = '0 0'; // Set origin to top-left for consistent transformations
+    // Helper function to apply transformations to both images
+    function applyTransform() {
+      const transformStyle = `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`;
+      const transformOrigin = '0 0';
+
+      const inputImg = inputPreview.querySelector('img');
+      const outputImg = outputPreview.querySelector('img');
+
+      if (inputImg) {
+        inputImg.style.transform = transformStyle;
+        inputImg.style.transformOrigin = transformOrigin;
+      }
+
+      if (outputImg) {
+        outputImg.style.transform = transformStyle;
+        outputImg.style.transformOrigin = transformOrigin;
+      }
     }
 
     // Zoom functionality
     function handleWheel(e) {
       e.preventDefault();
 
-      const type = e.currentTarget.id === 'input-preview' ? 'input' : 'output';
-      const t = transforms[type];
       const img = e.currentTarget.querySelector('img');
       if (!img) return;
 
@@ -180,59 +180,50 @@
 
       // Calculate zoom delta
       const delta = Math.sign(e.deltaY) * -0.1;
-      const newScale = Math.min(Math.max(t.scale + delta, 1), 5);
-      const scaleRatio = newScale / t.scale;
+      const newScale = Math.min(Math.max(transform.scale + delta, 1), 5);
+      const scaleRatio = newScale / transform.scale;
 
       // Update translate to keep the zoom centered on cursor
-      t.translateX = (t.translateX - x) * scaleRatio + x;
-      t.translateY = (t.translateY - y) * scaleRatio + y;
-      t.scale = newScale;
+      transform.translateX = (transform.translateX - x) * scaleRatio + x;
+      transform.translateY = (transform.translateY - y) * scaleRatio + y;
+      transform.scale = newScale;
 
-      applyTransform(img, type);
+      applyTransform();
     }
 
     // Panning functionality
     function handleMouseDown(e) {
       e.preventDefault();
-      const type = e.currentTarget.id === 'input-preview' ? 'input' : 'output';
-      transforms[type].isDragging = true;
-      transforms[type].startX = e.clientX - transforms[type].translateX;
-      transforms[type].startY = e.clientY - transforms[type].translateY;
+      transform.isDragging = true;
+      transform.startX = e.clientX - transform.translateX;
+      transform.startY = e.clientY - transform.translateY;
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
 
     function handleMouseMove(e) {
-      for (const type in transforms) {
-        const t = transforms[type];
-        if (t.isDragging) {
-          t.translateX = e.clientX - t.startX;
-          t.translateY = e.clientY - t.startY;
-          const img = type === 'input' ? inputPreview.querySelector('img') : outputPreview.querySelector('img');
-          if (img) {
-            applyTransform(img, type);
-          }
-        }
+      if (transform.isDragging) {
+        transform.translateX = e.clientX - transform.startX;
+        transform.translateY = e.clientY - transform.startY;
+        applyTransform();
       }
     }
 
     function handleMouseUp(e) {
-      for (const type in transforms) {
-        transforms[type].isDragging = false;
-      }
+      transform.isDragging = false;
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     }
 
     // Initialize event listeners for zoom and pan
-    function initializeInteractions(previewElement, type) {
+    function initializeInteractions(previewElement) {
       previewElement.addEventListener('wheel', handleWheel);
       previewElement.addEventListener('mousedown', handleMouseDown);
     }
 
     // Apply interactions to both input and output previews
-    initializeInteractions(inputPreview, 'input');
-    initializeInteractions(outputPreview, 'output');
+    initializeInteractions(inputPreview);
+    initializeInteractions(outputPreview);
 
     // Drag and drop handlers
     inputPreview.addEventListener('dragover', (event) => {
@@ -273,15 +264,17 @@
       
       const reader = new FileReader();
       reader.onload = (e) => {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.style.cursor = 'grab';
+        const imgInput = document.createElement('img');
+        imgInput.src = e.target.result;
+        imgInput.style.cursor = 'grab';
         inputPreview.innerHTML = '';
-        inputPreview.appendChild(img);
+        inputPreview.appendChild(imgInput);
 
         // Reset transformations
-        transforms.input = { scale: 1, translateX: 0, translateY: 0, isDragging: false, startX: 0, startY: 0 };
-        applyTransform(img, 'input');
+        transform.scale = 1;
+        transform.translateX = 0;
+        transform.translateY = 0;
+        applyTransform();
       };
       reader.readAsDataURL(file);
 
@@ -325,9 +318,8 @@
         outputPreview.innerHTML = '';
         outputPreview.appendChild(img);
 
-        // Reset transformations
-        transforms.output = { scale: 1, translateX: 0, translateY: 0, isDragging: false, startX: 0, startY: 0 };
-        applyTransform(img, 'output');
+        // Apply current transformations to the new output image
+        applyTransform();
       })
       .catch(error => {
         console.error('Error:', error);
