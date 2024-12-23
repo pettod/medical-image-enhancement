@@ -18,7 +18,7 @@
     }
 
     .dropzone {
-      width: 300px;
+      width: 600px;
       height: 200px;
       border: 2px dashed #ccc;
       border-radius: 5px;
@@ -136,9 +136,6 @@
           body: formData
         })
         .then(response => response.json())
-        .then(data => {
-          alert(data.message || 'File uploaded successfully!');
-        })
         .catch(error => {
           console.error('Error:', error);
           alert('An error occurred during the upload.');
@@ -169,7 +166,6 @@
       })
       .then(response => response.json())
       .then(data => {
-        alert(data.message || 'Button clicked!');
         // Reset dropzone text after successful button click
         dropzone.textContent = 'Drag and drop files here';
         currentFileName = null;
