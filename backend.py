@@ -16,6 +16,9 @@ def handle_upload():
     if upload:
         # Get file name and extension
         name, ext = os.path.splitext(upload.filename)
+        # Check if file exists and remove it
+        if os.path.exists(f"uploads/{upload.filename}"):
+            os.remove(f"uploads/{upload.filename}")
         # Save file
         upload.save(f"uploads/{upload.filename}")
         return {"message": f"File {upload.filename} uploaded successfully"}
