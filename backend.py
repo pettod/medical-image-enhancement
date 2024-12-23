@@ -1,6 +1,15 @@
 from bottle import Bottle, request, static_file
 import os
 from PIL import Image
+import argparse
+
+# Parse command line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--global', default=None, action='store_true', help='Use 0.0.0.0 instead of localhost')
+args = parser.parse_args()
+
+# Set host based on args
+HOST = '0.0.0.0' if getattr(args, 'global') else 'localhost'
 
 app = Bottle()
 
@@ -64,4 +73,4 @@ if not os.path.exists('uploads'):
 
 # Run the server
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host=HOST, port=8080, debug=True)
