@@ -134,56 +134,107 @@
     const inputPreview = document.getElementById('input-preview');
     const outputPreview = document.getElementById('output-preview');
     const fileInput = document.getElementById('file-input');
+
     let currentFileName = null;
-    let scale = 1;
-    let isDragging = false;
-    let startX, startY, initialX, initialY;
+
+    // Transformation state for input and output images
+    const transforms = {
+      input: {
+        scale: 1,
+        translateX: 0,
+        translateY: 0,
+        isDragging: false,
+        startX: 0,
+        startY: 0
+      },
+      output: {
+        scale: 1,
+        translateX: 0,
+        translateY: 0,
+        isDragging: false,
+        startX: 0,
+        startY: 0
+      }
+    };
+
+    // Helper function to apply transformations
+    function applyTransform(img, type) {
+      const t = transforms[type];
+      img.style.transform = `scale(${t.scale}) translate(${t.translateX}px, ${t.translateY}px)`;
+      img.style.transformOrigin = '0 0'; // Set origin to top-left for consistent transformations
+    }
 
     // Zoom functionality
     function handleWheel(e) {
       e.preventDefault();
-      
+
+      const type = e.currentTarget.id === 'input-preview' ? 'input' : 'output';
+      const t = transforms[type];
+      const img = e.currentTarget.querySelector('img');
+      if (!img) return;
+
       // Get cursor position relative to the preview container
       const rect = e.currentTarget.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      // Calculate zoom
+      // Calculate zoom delta
       const delta = Math.sign(e.deltaY) * -0.1;
-      const newScale = Math.min(Math.max(scale + delta, 1), 5);
-      
-      if (newScale !== scale) {
-        // Calculate the point to zoom towards
-        const oldScale = scale;
-        scale = newScale;
+      const newScale = Math.min(Math.max(t.scale + delta, 1), 5);
+      const scaleRatio = newScale / t.scale;
 
-        const inputImg = inputPreview.querySelector('img');
-        const outputImg = outputPreview.querySelector('img');
-        
-        if (inputImg) {
-          // Calculate new positions to zoom towards cursor
-          const scaleRatio = newScale / oldScale;
-          const translateX = (x - x * scaleRatio);
-          const translateY = (y - y * scaleRatio);
-          
-          inputImg.style.transformOrigin = `${x}px ${y}px`;
-          inputImg.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-        }
-        if (outputImg) {
-          // Apply same transform to output image
-          const scaleRatio = newScale / oldScale;
-          const translateX = (x - x * scaleRatio);
-          const translateY = (y - y * scaleRatio);
-          
-          outputImg.style.transformOrigin = `${x}px ${y}px`;
-          outputImg.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+      // Update translate to keep the zoom centered on cursor
+      t.translateX = (t.translateX - x) * scaleRatio + x;
+      t.translateY = (t.translateY - y) * scaleRatio + y;
+      t.scale = newScale;
+
+      applyTransform(img, type);
+    }
+
+    // Panning functionality
+    function handleMouseDown(e) {
+      e.preventDefault();
+      const type = e.currentTarget.id === 'input-preview' ? 'input' : 'output';
+      transforms[type].isDragging = true;
+      transforms[type].startX = e.clientX - transforms[type].translateX;
+      transforms[type].startY = e.clientY - transforms[type].translateY;
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    function handleMouseMove(e) {
+      for (const type in transforms) {
+        const t = transforms[type];
+        if (t.isDragging) {
+          t.translateX = e.clientX - t.startX;
+          t.translateY = e.clientY - t.startY;
+          const img = type === 'input' ? inputPreview.querySelector('img') : outputPreview.querySelector('img');
+          if (img) {
+            applyTransform(img, type);
+          }
         }
       }
     }
 
-    inputPreview.addEventListener('wheel', handleWheel);
-    outputPreview.addEventListener('wheel', handleWheel);
+    function handleMouseUp(e) {
+      for (const type in transforms) {
+        transforms[type].isDragging = false;
+      }
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    }
 
+    // Initialize event listeners for zoom and pan
+    function initializeInteractions(previewElement, type) {
+      previewElement.addEventListener('wheel', handleWheel);
+      previewElement.addEventListener('mousedown', handleMouseDown);
+    }
+
+    // Apply interactions to both input and output previews
+    initializeInteractions(inputPreview, 'input');
+    initializeInteractions(outputPreview, 'output');
+
+    // Drag and drop handlers
     inputPreview.addEventListener('dragover', (event) => {
       event.preventDefault();
       inputPreview.classList.add('dragover');
@@ -208,6 +259,7 @@
       }
     });
 
+    // Handle file upload and display
     function handleFile(file) {
       if (!file.type.startsWith('image/')) {
         alert('Please upload an image file');
@@ -223,8 +275,13 @@
       reader.onload = (e) => {
         const img = document.createElement('img');
         img.src = e.target.result;
+        img.style.cursor = 'grab';
         inputPreview.innerHTML = '';
         inputPreview.appendChild(img);
+
+        // Reset transformations
+        transforms.input = { scale: 1, translateX: 0, translateY: 0, isDragging: false, startX: 0, startY: 0 };
+        applyTransform(img, 'input');
       };
       reader.readAsDataURL(file);
 
@@ -242,6 +299,7 @@
       });
     }
 
+    // Handle button clicks for image processing
     function buttonClick(buttonName) {
       if (!currentFileName) {
         alert('Please upload an image first');
@@ -263,8 +321,13 @@
         const url = URL.createObjectURL(blob);
         const img = document.createElement('img');
         img.src = url;
+        img.style.cursor = 'grab';
         outputPreview.innerHTML = '';
         outputPreview.appendChild(img);
+
+        // Reset transformations
+        transforms.output = { scale: 1, translateX: 0, translateY: 0, isDragging: false, startX: 0, startY: 0 };
+        applyTransform(img, 'output');
       })
       .catch(error => {
         console.error('Error:', error);
