@@ -142,19 +142,41 @@
     // Zoom functionality
     function handleWheel(e) {
       e.preventDefault();
+      
+      // Get cursor position relative to the preview container
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Calculate zoom
       const delta = Math.sign(e.deltaY) * -0.1;
       const newScale = Math.min(Math.max(scale + delta, 1), 5);
       
       if (newScale !== scale) {
+        // Calculate the point to zoom towards
+        const oldScale = scale;
         scale = newScale;
+
         const inputImg = inputPreview.querySelector('img');
         const outputImg = outputPreview.querySelector('img');
         
         if (inputImg) {
-          inputImg.style.transform = `scale(${scale})`;
+          // Calculate new positions to zoom towards cursor
+          const scaleRatio = newScale / oldScale;
+          const translateX = (x - x * scaleRatio);
+          const translateY = (y - y * scaleRatio);
+          
+          inputImg.style.transformOrigin = `${x}px ${y}px`;
+          inputImg.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
         }
         if (outputImg) {
-          outputImg.style.transform = `scale(${scale})`;
+          // Apply same transform to output image
+          const scaleRatio = newScale / oldScale;
+          const translateX = (x - x * scaleRatio);
+          const translateY = (y - y * scaleRatio);
+          
+          outputImg.style.transformOrigin = `${x}px ${y}px`;
+          outputImg.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
         }
       }
     }
