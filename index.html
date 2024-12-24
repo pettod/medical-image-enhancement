@@ -114,6 +114,68 @@
         .buttons button:active {
           transform: translateY(0);
         }
+
+        .history-container {
+          margin-top: 20px;
+          width: 100%;
+          max-width: 800px;
+          overflow-x: auto;
+          position: relative;
+          padding: 10px 0;
+          scrollbar-width: thin;
+          scrollbar-color: #cbd5e0 #f3f4f6;
+        }
+
+        .history-container::-webkit-scrollbar {
+          height: 8px;
+        }
+
+        .history-container::-webkit-scrollbar-track {
+          background: #f3f4f6;
+          border-radius: 4px;
+        }
+
+        .history-container::-webkit-scrollbar-thumb {
+          background: #cbd5e0;
+          border-radius: 4px;
+        }
+
+        #history {
+          display: flex;
+          gap: 20px;
+          white-space: nowrap;
+          padding: 0 10px;
+        }
+
+        .history-box {
+          padding: 8px 16px;
+          background: #f3f4f6;
+          border-radius: 6px;
+          color: #4b5563;
+          font-size: 0.9rem;
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+        }
+
+        .history-box img {
+          width: 100px;
+          height: 100px;
+          object-fit: contain;
+          margin-top: 8px;
+          border-radius: 4px;
+        }
+
+        .history-box:not(:last-child)::after {
+          content: '';
+          position: absolute;
+          right: -20px;
+          top: 50%;
+          width: 20px;
+          height: 4px;
+          background: #cbd5e0;
+        }
       </style>
     </head>
     <body>
@@ -140,13 +202,21 @@
           <button onclick="buttonClick('Edge Detection')">Edge Detection</button>
           <button onclick="buttonClick('Segment')">Segment</button>
         </div>
+
+        <div class="history-container">
+          <div id="history">
+          </div>
+        </div>
     
           <script>
             const inputPreview = document.getElementById('input-preview');
             const outputPreview = document.getElementById('output-preview');
             const fileInput = document.getElementById('file-input');
+            const history = document.getElementById('history');
         
             let currentFileName = null;
+            let operationHistory = [];
+            let historyImages = [];
         
             // Shared transform state
             let scale = 1;
@@ -161,6 +231,23 @@
             let initialY = 0;
             let touchStartDist = 0;
             let touchStartScale = scale;
+
+            function updateHistory(operation) {
+              operationHistory.push(operation);
+              history.innerHTML = '';
+              operationHistory.forEach((op, index) => {
+                const box = document.createElement('div');
+                box.className = 'history-box';
+                box.textContent = op;
+                
+                // Add the result image below the operation text
+                const img = document.createElement('img');
+                img.src = historyImages[index];
+                box.appendChild(img);
+                
+                history.appendChild(box);
+              });
+            }
         
             // Function to initialize zoom and pan for both image elements
             function initZoomPan() {
@@ -359,6 +446,9 @@
               formData.append('file', file);
               
               currentFileName = file.name;
+              operationHistory = []; // Reset history when new file is uploaded
+              historyImages = []; // Reset history images
+              history.innerHTML = ''; // Clear history display
               
               const reader = new FileReader();
               reader.onload = (e) => {
@@ -404,6 +494,9 @@
                 minScale = 1;
                 translateX = 0;
                 translateY = 0;
+                operationHistory = [];
+                historyImages = [];
+                history.innerHTML = '';
               });
             }
         
@@ -447,6 +540,10 @@
                   initZoomPan();
                   updateTransform();
                 };
+
+                // Store the output image URL in historyImages array
+                historyImages.push(url);
+                updateHistory(buttonName);
               })
               .catch(error => {
                 console.error('Error:', error);
