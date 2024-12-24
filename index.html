@@ -156,14 +156,40 @@
       const outputImg = outputPreview.querySelector('img');
 
       if (inputImg) {
-        inputImg.style.transform = transformStyle;
+        constrainTransform(inputPreview, inputImg);
+        inputImg.style.transform = `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`;
         inputImg.style.transformOrigin = transformOrigin;
       }
 
       if (outputImg) {
-        outputImg.style.transform = transformStyle;
+        constrainTransform(outputPreview, outputImg);
+        outputImg.style.transform = `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`;
         outputImg.style.transformOrigin = transformOrigin;
       }
+    }
+
+    // Function to constrain the transform values to keep the image within the container
+    function constrainTransform(container, img) {
+      const containerRect = container.getBoundingClientRect();
+      const imgRect = img.getBoundingClientRect();
+
+      const scaledWidth = img.naturalWidth * transform.scale;
+      const scaledHeight = img.naturalHeight * transform.scale;
+
+      // Calculate the differences
+      const diffX = scaledWidth - containerRect.width;
+      const diffY = scaledHeight - containerRect.height;
+
+      // If the image is smaller than the container, center it
+      const minTranslateX = diffX > 0 ? -diffX : 0;
+      const maxTranslateX = 0;
+
+      const minTranslateY = diffY > 0 ? -diffY : 0;
+      const maxTranslateY = 0;
+
+      // Clamp the translateX and translateY
+      transform.translateX = Math.min(Math.max(transform.translateX, minTranslateX), maxTranslateX);
+      transform.translateY = Math.min(Math.max(transform.translateY, minTranslateY), maxTranslateY);
     }
 
     // Zoom functionality
