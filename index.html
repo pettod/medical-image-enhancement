@@ -3,7 +3,7 @@
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Medical Image Enhancement</title>
+      <title>Microscopy Image Enhancement</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
       <style>
         body {
@@ -11,54 +11,67 @@
           margin: 0;
           display: flex;
           min-height: 100vh;
-          background: white;
+          background: #fafafa;
+          color: #1a1a1a;
+          width: 100%;
+          overflow-x: hidden;
         }
 
         .buttons {
           display: flex;
           flex-direction: column;
-          gap: 15px;
-          padding: 20px;
-          background: #f8fafc;
-          border-right: 1px solid #e2e8f0;
-          width: 200px;
+          gap: 16px;
+          padding: 24px;
+          background: #ffffff;
+          border-right: 1px solid #f0f0f0;
+          width: 240px;
+          flex-shrink: 0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
     
         .preview-container {
           display: flex;
-          gap: 30px;
-          margin-bottom: 30px;
+          gap: 40px;
+          margin-bottom: 20px;
           justify-content: center;
           flex-wrap: wrap;
+          width: 100%;
+          max-width: 1200px;
+          padding: 0 24px;
+          box-sizing: border-box;
         }
     
         .preview-box {
           flex: 1;
-          width: 400px;
+          min-width: 320px;
+          max-width: 480px;
         }
     
         .preview-box h3 {
-          color: #2c3e50;
-          font-size: 1.5rem;
-          margin-bottom: 15px;
+          color: #1a1a1a;
+          font-size: 1.25rem;
+          font-weight: 600;
+          margin-bottom: 16px;
           text-align: center;
         }
     
         .preview {
           width: 100%;
           aspect-ratio: 1;
-          border: 3px dashed #cbd5e0;
-          border-radius: 12px;
+          border: 2px dashed #e5e5e5;
+          border-radius: 16px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #718096;
-          font-size: 1.1rem;
-          transition: all 0.3s ease;
-          background: #f8fafc;
+          color: #666666;
+          font-size: 1rem;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          background: #ffffff;
           overflow: hidden;
           position: relative;
           cursor: grab;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+          box-sizing: border-box;
         }
     
         .preview:active {
@@ -70,14 +83,14 @@
         }
     
         #input-preview:hover {
-          border-color: #4299e1;
-          background: #ebf8ff;
+          border-color: #2563eb;
+          background: #f8faff;
         }
     
         #input-preview.dragover {
-          border-color: #4299e1;
-          background: #ebf8ff;
-          transform: scale(1.02);
+          border-color: #2563eb;
+          background: #f8faff;
+          transform: scale(1.01);
         }
     
         .preview img {
@@ -89,28 +102,32 @@
           max-width: none;
           max-height: none;
           cursor: grab;
-          transition: transform 0.3s ease;
+          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           user-select: none;
           pointer-events: none;
         }
     
         .buttons button {
-          padding: 12px 24px;
+          padding: 14px 24px;
           border: none;
-          border-radius: 8px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 12px;
+          background: #2563eb;
           color: white;
           cursor: pointer;
-          font-size: 1rem;
+          font-size: 0.95rem;
           font-weight: 600;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
           width: 100%;
+          position: relative;
+          overflow: hidden;
+          box-sizing: border-box;
         }
     
         .buttons button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+          background: #1d4ed8;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
     
         .buttons button:active {
@@ -118,71 +135,77 @@
         }
 
         .history-container {
-          margin: 0 30px 30px;
           width: 100%;
-          max-width: 800px;
+          max-width: 1000px;
           overflow-x: auto;
           position: relative;
-          padding: 10px 0;
+          padding: 12px 0;
           scrollbar-width: thin;
-          scrollbar-color: #cbd5e0 #f3f4f6;
+          scrollbar-color: #e5e5e5 #ffffff;
+          mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+          -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+          box-sizing: border-box;
         }
 
         .history-container::-webkit-scrollbar {
-          height: 8px;
+          height: 6px;
         }
 
         .history-container::-webkit-scrollbar-track {
-          background: #f3f4f6;
-          border-radius: 4px;
+          background: #ffffff;
+          border-radius: 8px;
         }
 
         .history-container::-webkit-scrollbar-thumb {
-          background: #cbd5e0;
-          border-radius: 4px;
+          background: #e5e5e5;
+          border-radius: 8px;
         }
 
         #history {
           display: flex;
-          gap: 20px;
+          gap: 24px;
           white-space: nowrap;
-          padding: 0 10px;
+          padding: 0 12px;
+          box-sizing: border-box;
         }
 
         .history-box {
-          padding: 8px 16px;
-          background: #f3f4f6;
-          border-radius: 6px;
+          padding: 12px 20px;
+          background: #ffffff;
+          border-radius: 12px;
           color: #4b5563;
           font-size: 0.9rem;
           display: inline-flex;
           flex-direction: column;
           align-items: center;
           position: relative;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+          border: 1px solid #f0f0f0;
+          box-sizing: border-box;
         }
 
         .history-box img {
-          width: 100px;
-          height: 100px;
+          width: 120px;
+          height: 120px;
           object-fit: contain;
-          margin-top: 8px;
-          border-radius: 4px;
+          margin-top: 12px;
+          border-radius: 8px;
           cursor: pointer;
-          transition: transform 0.2s;
+          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .history-box img:hover {
-          transform: scale(1.05);
+          transform: scale(1.03);
         }
 
         .history-box:not(:last-child)::after {
           content: '';
           position: absolute;
-          right: -20px;
+          right: -24px;
           top: 50%;
-          width: 20px;
-          height: 4px;
-          background: #cbd5e0;
+          width: 24px;
+          height: 2px;
+          background: #e5e5e5;
         }
 
         .modal {
@@ -192,17 +215,19 @@
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.8);
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(4px);
           z-index: 1000;
           justify-content: center;
           align-items: center;
         }
 
         .modal img {
-          max-width: 90%;
-          max-height: 90vh;
+          max-width: 92%;
+          max-height: 92vh;
           object-fit: contain;
-          border-radius: 8px;
+          border-radius: 16px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
         .modal.active {
@@ -214,6 +239,8 @@
           display: flex;
           flex-direction: column;
           align-items: center;
+          padding: 32px 0;
+          min-width: 0;
         }
       </style>
     </head>
