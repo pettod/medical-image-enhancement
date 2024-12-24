@@ -238,7 +238,7 @@
               operationHistory.forEach((op, index) => {
                 const box = document.createElement('div');
                 box.className = 'history-box';
-                box.textContent = op;
+                box.textContent = `${index + 1}. ${op}`; // Add enumeration
                 
                 // Add the result image below the operation text
                 const img = document.createElement('img');
