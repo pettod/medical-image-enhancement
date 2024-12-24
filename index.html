@@ -1,358 +1,432 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medical Image Enhancement</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      background: white;
-    }
-
-    .preview-container {
-      display: flex;
-      gap: 30px;
-      margin-bottom: 30px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .preview-box {
-      flex: 1;
-      width: 400px;
-    }
-
-    .preview-box h3 {
-      color: #2c3e50;
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .preview {
-      width: 100%;
-      aspect-ratio: 1;
-      border: 3px dashed #cbd5e0;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #718096;
-      font-size: 1.1rem;
-      transition: all 0.3s ease;
-      background: #f8fafc;
-      overflow: hidden;
-      position: relative;
-    }
-
-    #input-preview {
-      cursor: pointer;
-    }
-
-    #input-preview:hover {
-      border-color: #4299e1;
-      background: #ebf8ff;
-    }
-
-    #input-preview.dragover {
-      border-color: #4299e1;
-      background: #ebf8ff;
-      transform: scale(1.02);
-    }
-
-    .preview img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      transform-origin: center;
-      transition: transform 0.2s ease;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .buttons button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .buttons button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-    }
-
-    .buttons button:active {
-      transform: translateY(0);
-    }
-  </style>
-</head>
-<body>
-    <div class="preview-container">
-      <div class="preview-box">
-        <h3>Input Image</h3>
-        <div id="input-preview" class="preview" onclick="document.getElementById('file-input').click()">
-          Drag and drop image here
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Medical Image Enhancement</title>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+      <style>
+        body {
+          font-family: 'Inter', sans-serif;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-height: 100vh;
+          background: white;
+        }
+    
+        .preview-container {
+          display: flex;
+          gap: 30px;
+          margin-bottom: 30px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+    
+        .preview-box {
+          flex: 1;
+          width: 400px;
+        }
+    
+        .preview-box h3 {
+          color: #2c3e50;
+          font-size: 1.5rem;
+          margin-bottom: 15px;
+          text-align: center;
+        }
+    
+        .preview {
+          width: 100%;
+          aspect-ratio: 1;
+          border: 3px dashed #cbd5e0;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #718096;
+          font-size: 1.1rem;
+          transition: all 0.3s ease;
+          background: #f8fafc;
+          overflow: hidden;
+          position: relative;
+          cursor: grab;
+        }
+    
+        .preview:active {
+          cursor: grabbing;
+        }
+    
+        #input-preview {
+          cursor: pointer;
+        }
+    
+        #input-preview:hover {
+          border-color: #4299e1;
+          background: #ebf8ff;
+        }
+    
+        #input-preview.dragover {
+          border-color: #4299e1;
+          background: #ebf8ff;
+          transform: scale(1.02);
+        }
+    
+        .preview img {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(1);
+          transform-origin: center center;
+          max-width: none;
+          max-height: none;
+          cursor: grab;
+          transition: transform 0.3s ease;
+          user-select: none;
+          pointer-events: none;
+        }
+    
+        .buttons {
+          display: flex;
+          gap: 15px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+    
+        .buttons button {
+          padding: 12px 24px;
+          border: none;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    
+        .buttons button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+    
+        .buttons button:active {
+          transform: translateY(0);
+        }
+      </style>
+    </head>
+    <body>
+        <div class="preview-container">
+          <div class="preview-box">
+            <h3>Input Image</h3>
+            <div id="input-preview" class="preview" onclick="document.getElementById('file-input').click()">
+              Drag and drop image here
+            </div>
+            <input type="file" id="file-input" accept="image/*" style="display: none">
+          </div>
+    
+          <div class="preview-box">
+            <h3>Output Image</h3>
+            <div id="output-preview" class="preview" style="border: 3px solid #cbd5e0; background: white;">
+              No output yet
+            </div>
+          </div>
         </div>
-        <input type="file" id="file-input" accept="image/*" style="display: none">
-      </div>
-
-      <div class="preview-box">
-        <h3>Output Image</h3>
-        <div id="output-preview" class="preview" style="border: 3px solid #cbd5e0; background: white;">
-          No output yet
+    
+        <div class="buttons">
+          <button onclick="buttonClick('Denoise')">Denoise</button>
+          <button onclick="buttonClick('Deblur')">Deblur</button>
+          <button onclick="buttonClick('Super Resolve')">Super Resolve</button>
+          <button onclick="buttonClick('Segment')">Segment</button>
         </div>
-      </div>
-    </div>
-
-    <div class="buttons">
-      <button onclick="buttonClick('Denoise')">Denoise</button>
-      <button onclick="buttonClick('Deblur')">Deblur</button>
-      <button onclick="buttonClick('Super Resolve')">Super Resolve</button>
-      <button onclick="buttonClick('Segment')">Segment</button>
-    </div>
-
-  <script>
-    const inputPreview = document.getElementById('input-preview');
-    const outputPreview = document.getElementById('output-preview');
-    const fileInput = document.getElementById('file-input');
-
-    let currentFileName = null;
-
-    // Shared Transformation state for both images
-    const transform = {
-      scale: 1,
-      translateX: 0,
-      translateY: 0,
-      isDragging: false,
-      startX: 0,
-      startY: 0
-    };
-
-    // Helper function to apply transformations to both images
-    function applyTransform() {
-      const transformStyle = `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`;
-      const transformOrigin = '0 0';
-
-      const inputImg = inputPreview.querySelector('img');
-      const outputImg = outputPreview.querySelector('img');
-
-      if (inputImg) {
-        constrainTransform(inputPreview, inputImg);
-        inputImg.style.transform = `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`;
-        inputImg.style.transformOrigin = transformOrigin;
-      }
-
-      if (outputImg) {
-        constrainTransform(outputPreview, outputImg);
-        outputImg.style.transform = `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`;
-        outputImg.style.transformOrigin = transformOrigin;
-      }
-    }
-
-    // Function to constrain the transform values to keep the image within the container
-    function constrainTransform(container, img) {
-      const containerRect = container.getBoundingClientRect();
-      const imgRect = img.getBoundingClientRect();
-
-      const scaledWidth = img.naturalWidth * transform.scale;
-      const scaledHeight = img.naturalHeight * transform.scale;
-
-      // Calculate the differences
-      const diffX = scaledWidth - containerRect.width;
-      const diffY = scaledHeight - containerRect.height;
-
-      // If the image is smaller than the container, center it
-      const minTranslateX = diffX > 0 ? -diffX : 0;
-      const maxTranslateX = 0;
-
-      const minTranslateY = diffY > 0 ? -diffY : 0;
-      const maxTranslateY = 0;
-
-      // Clamp the translateX and translateY
-      transform.translateX = Math.min(Math.max(transform.translateX, minTranslateX), maxTranslateX);
-      transform.translateY = Math.min(Math.max(transform.translateY, minTranslateY), maxTranslateY);
-    }
-
-    // Zoom functionality
-    function handleWheel(e) {
-      e.preventDefault();
-
-      const img = e.currentTarget.querySelector('img');
-      if (!img) return;
-
-      // Get cursor position relative to the preview container
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      // Calculate zoom delta
-      const delta = Math.sign(e.deltaY) * -0.1;
-      const newScale = Math.min(Math.max(transform.scale + delta, 1), 5);
-      const scaleRatio = newScale / transform.scale;
-
-      // Update translate to keep the zoom centered on cursor
-      transform.translateX = (transform.translateX - x) * scaleRatio + x;
-      transform.translateY = (transform.translateY - y) * scaleRatio + y;
-      transform.scale = newScale;
-
-      applyTransform();
-    }
-
-    // Panning functionality
-    function handleMouseDown(e) {
-      e.preventDefault();
-      transform.isDragging = true;
-      transform.startX = e.clientX - transform.translateX;
-      transform.startY = e.clientY - transform.translateY;
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    function handleMouseMove(e) {
-      if (transform.isDragging) {
-        transform.translateX = e.clientX - transform.startX;
-        transform.translateY = e.clientY - transform.startY;
-        applyTransform();
-      }
-    }
-
-    function handleMouseUp(e) {
-      transform.isDragging = false;
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    }
-
-    // Initialize event listeners for zoom and pan
-    function initializeInteractions(previewElement) {
-      previewElement.addEventListener('wheel', handleWheel);
-      previewElement.addEventListener('mousedown', handleMouseDown);
-    }
-
-    // Apply interactions to both input and output previews
-    initializeInteractions(inputPreview);
-    initializeInteractions(outputPreview);
-
-    // Drag and drop handlers
-    inputPreview.addEventListener('dragover', (event) => {
-      event.preventDefault();
-      inputPreview.classList.add('dragover');
-    });
-
-    inputPreview.addEventListener('dragleave', () => {
-      inputPreview.classList.remove('dragover');
-    });
-
-    fileInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      handleFile(file);
-    });
-
-    inputPreview.addEventListener('drop', (event) => {
-      event.preventDefault();
-      inputPreview.classList.remove('dragover');
-
-      const files = event.dataTransfer.files;
-      if (files.length > 0) {
-        handleFile(files[0]);
-      }
-    });
-
-    // Handle file upload and display
-    function handleFile(file) {
-      if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file');
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      currentFileName = file.name;
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imgInput = document.createElement('img');
-        imgInput.src = e.target.result;
-        imgInput.style.cursor = 'grab';
-        inputPreview.innerHTML = '';
-        inputPreview.appendChild(imgInput);
-
-        // Reset transformations
-        transform.scale = 1;
-        transform.translateX = 0;
-        transform.translateY = 0;
-        applyTransform();
-      };
-      reader.readAsDataURL(file);
-
-      fetch('/upload', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred during the upload.');
-        inputPreview.innerHTML = 'Drag and drop image here';
-        currentFileName = null;
-        outputPreview.innerHTML = 'No output yet';
-      });
-    }
-
-    // Handle button clicks for image processing
-    function buttonClick(buttonName) {
-      if (!currentFileName) {
-        alert('Please upload an image first');
-        return;
-      }
-
-      fetch('/button-click', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          button_name: buttonName,
-          file_name: currentFileName
-        })
-      })
-      .then(response => response.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        const img = document.createElement('img');
-        img.src = url;
-        img.style.cursor = 'grab';
-        outputPreview.innerHTML = '';
-        outputPreview.appendChild(img);
-
-        // Apply current transformations to the new output image
-        applyTransform();
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred during the button click.');
-      });
-    }
-  </script>
-
-</body>
+    
+      <script>
+        const inputPreview = document.getElementById('input-preview');
+        const outputPreview = document.getElementById('output-preview');
+        const fileInput = document.getElementById('file-input');
+    
+        let currentFileName = null;
+    
+        // Shared transform state
+        let scale = 0.5;
+        const minScale = 0.5;
+        const maxScale = 3;
+        let translateX = 0;
+        let translateY = 0;
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+        let initialX = 0;
+        let initialY = 0;
+        let touchStartDist = 0;
+        let touchStartScale = scale;
+    
+        // Function to initialize zoom and pan for both image elements
+        function initZoomPan() {
+          const imgs = [inputPreview.querySelector('img'), outputPreview.querySelector('img')];
+          imgs.forEach(img => {
+            if (!img) return;
+            // Disable default drag behavior on image
+            img.onmousedown = (e) => e.preventDefault();
+          });
+    
+          // Handle wheel for zooming
+          [inputPreview, outputPreview].forEach(preview => {
+            preview.addEventListener('wheel', function(e) {
+              e.preventDefault();
+              const delta = -e.deltaY;
+              const zoomFactor = delta > 0 ? 1.01 : 0.99;
+              let newScale = scale * zoomFactor;
+              newScale = Math.min(Math.max(newScale, minScale), maxScale);
+              if (newScale === scale) return;
+    
+              // Calculate the mouse position relative to the image
+              const img = preview.querySelector('img');
+              if (!img) return;
+              const rect = img.getBoundingClientRect();
+              const offsetX = e.clientX - rect.left;
+              const offsetY = e.clientY - rect.top;
+              const dx = (offsetX / rect.width - 0.5) * (newScale - scale);
+              const dy = (offsetY / rect.height - 0.5) * (newScale - scale);
+    
+              scale = newScale;
+              translateX -= dx * rect.width;
+              translateY -= dy * rect.height;
+    
+              constrainPan();
+              updateTransform();
+            });
+    
+            // Handle mousedown for panning
+            preview.addEventListener('mousedown', function(e) {
+              e.preventDefault();
+              isPanning = true;
+              startX = e.clientX;
+              startY = e.clientY;
+              initialX = translateX;
+              initialY = translateY;
+              preview.style.cursor = 'grabbing';
+            });
+    
+            // Handle mousemove for panning
+            preview.addEventListener('mousemove', function(e) {
+              if (!isPanning) return;
+              const dx = e.clientX - startX;
+              const dy = e.clientY - startY;
+              translateX = initialX + dx;
+              translateY = initialY + dy;
+              constrainPan();
+              updateTransform();
+            });
+    
+            // Handle mouseup and mouseleave to stop panning
+            ['mouseup', 'mouseleave'].forEach(event => {
+              preview.addEventListener(event, function() {
+                isPanning = false;
+                preview.style.cursor = 'grab';
+              });
+            });
+    
+            // Touch events for mobile devices
+            preview.addEventListener('touchstart', function(e) {
+              if (e.touches.length === 1) {
+                isPanning = true;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                initialX = translateX;
+                initialY = translateY;
+              } else if (e.touches.length === 2) {
+                isPanning = false;
+                touchStartDist = getDistance(e.touches);
+                touchStartScale = scale;
+              }
+            });
+    
+            preview.addEventListener('touchmove', function(e) {
+              e.preventDefault();
+              if (e.touches.length === 1 && isPanning) {
+                const dx = e.touches[0].clientX - startX;
+                const dy = e.touches[0].clientY - startY;
+                translateX = initialX + dx;
+                translateY = initialY + dy;
+                constrainPan();
+                updateTransform();
+              } else if (e.touches.length === 2) {
+                const currentDist = getDistance(e.touches);
+                let zoomFactor = currentDist / touchStartDist;
+                let newScale = touchStartScale * zoomFactor;
+                newScale = Math.min(Math.max(newScale, minScale), maxScale);
+                if (newScale === scale) return;
+    
+                scale = newScale;
+                constrainPan();
+                updateTransform();
+              }
+            }, { passive: false });
+    
+            preview.addEventListener('touchend', function(e) {
+              if (e.touches.length < 2) {
+                touchStartDist = 0;
+              }
+              if (e.touches.length === 0) {
+                isPanning = false;
+              }
+            });
+          });
+        }
+    
+        function getDistance(touches) {
+          const dx = touches[0].clientX - touches[1].clientX;
+          const dy = touches[0].clientY - touches[1].clientY;
+          return Math.sqrt(dx * dx + dy * dy);
+        }
+    
+        // Update the CSS transform property for both images
+        function updateTransform() {
+          [inputPreview, outputPreview].forEach(preview => {
+            const img = preview.querySelector('img');
+            if (!img) return;
+            img.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+          });
+        }
+    
+        // Constrain the panning so that the image stays within the preview boundaries
+        function constrainPan() {
+          [inputPreview, outputPreview].forEach(preview => {
+            const img = preview.querySelector('img');
+            if (!img) return;
+            const rect = img.getBoundingClientRect();
+            const previewRect = preview.getBoundingClientRect();
+    
+            const imgWidth = rect.width;
+            const imgHeight = rect.height;
+            const previewWidth = previewRect.width;
+            const previewHeight = previewRect.height;
+    
+            // Calculate the maximum translation
+            const maxTranslateX = (imgWidth - previewWidth) / 2;
+            const maxTranslateY = (imgHeight - previewHeight) / 2;
+    
+            // If the image is smaller than the preview, center it
+            if (imgWidth <= previewWidth) {
+              translateX = 0;
+            } else {
+              translateX = Math.min(Math.max(translateX, -maxTranslateX), maxTranslateX);
+            }
+    
+            if (imgHeight <= previewHeight) {
+              translateY = 0;
+            } else {
+              translateY = Math.min(Math.max(translateY, -maxTranslateY), maxTranslateY);
+            }
+          });
+        }
+    
+        // Drag and drop handlers
+        inputPreview.addEventListener('dragover', (event) => {
+          event.preventDefault();
+          inputPreview.classList.add('dragover');
+        });
+    
+        inputPreview.addEventListener('dragleave', () => {
+          inputPreview.classList.remove('dragover');
+        });
+    
+        fileInput.addEventListener('change', (event) => {
+          const file = event.target.files[0];
+          handleFile(file);
+        });
+    
+        inputPreview.addEventListener('drop', (event) => {
+          event.preventDefault();
+          inputPreview.classList.remove('dragover');
+    
+          const files = event.dataTransfer.files;
+          if (files.length > 0) {
+            handleFile(files[0]);
+          }
+        });
+    
+        // Handle file upload and display
+        function handleFile(file) {
+          if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file');
+            return;
+          }
+    
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          currentFileName = file.name;
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const imgInput = document.createElement('img');
+            imgInput.src = e.target.result;
+            inputPreview.innerHTML = '';
+            inputPreview.appendChild(imgInput);
+    
+            const imgOutput = document.createElement('img');
+            outputPreview.innerHTML = '';
+            outputPreview.appendChild(imgOutput);
+    
+            initZoomPan();
+            updateTransform();
+          };
+          reader.readAsDataURL(file);
+    
+          fetch('/upload', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during the upload.');
+            inputPreview.innerHTML = 'Drag and drop image here';
+            outputPreview.innerHTML = 'No output yet';
+            currentFileName = null;
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+          });
+        }
+    
+        // Handle button clicks for image processing
+        function buttonClick(buttonName) {
+          if (!currentFileName) {
+            alert('Please upload an image first');
+            return;
+          }
+    
+          fetch('/button-click', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              button_name: buttonName,
+              file_name: currentFileName
+            })
+          })
+          .then(response => response.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const imgOutput = document.createElement('img');
+            imgOutput.src = url;
+            outputPreview.innerHTML = '';
+            outputPreview.appendChild(imgOutput);
+            initZoomPan();
+            updateTransform();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during the button click.');
+          });
+        }
+      </script>
+    
+    </body>
+</html>
 </html>
