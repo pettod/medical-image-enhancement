@@ -10,10 +10,18 @@
           font-family: 'Inter', sans-serif;
           margin: 0;
           display: flex;
-          flex-direction: column;
-          align-items: center;
           min-height: 100vh;
           background: white;
+        }
+
+        .buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          padding: 20px;
+          background: #f8fafc;
+          border-right: 1px solid #e2e8f0;
+          width: 200px;
         }
     
         .preview-container {
@@ -86,13 +94,6 @@
           pointer-events: none;
         }
     
-        .buttons {
-          display: flex;
-          gap: 15px;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-    
         .buttons button {
           padding: 12px 24px;
           border: none;
@@ -104,6 +105,7 @@
           font-weight: 600;
           transition: all 0.3s ease;
           box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          width: 100%;
         }
     
         .buttons button:hover {
@@ -116,7 +118,7 @@
         }
 
         .history-container {
-          margin-top: 20px;
+          margin: 0 30px 30px;
           width: 100%;
           max-width: 800px;
           overflow-x: auto;
@@ -206,26 +208,16 @@
         .modal.active {
           display: flex;
         }
+
+        .main-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
       </style>
     </head>
     <body>
-        <div class="preview-container">
-          <div class="preview-box">
-            <h3>Input Image</h3>
-            <div id="input-preview" class="preview" onclick="document.getElementById('file-input').click()">
-              Drag and drop image here
-            </div>
-            <input type="file" id="file-input" accept="image/*" style="display: none">
-          </div>
-    
-          <div class="preview-box">
-            <h3>Output Image</h3>
-            <div id="output-preview" class="preview" style="border: 3px solid #cbd5e0; background: white;">
-              No output yet
-            </div>
-          </div>
-        </div>
-    
         <div class="buttons">
           <button onclick="buttonClick('Denoise')">Denoise</button>
           <button onclick="buttonClick('Deblur')">Deblur</button>
@@ -233,12 +225,31 @@
           <button onclick="buttonClick('Segment')">Segment</button>
         </div>
 
-        <div class="history-container">
-          <div id="history">
+        <div class="main-content">
+          <div class="preview-container">
+            <div class="preview-box">
+              <h3>Input Image</h3>
+              <div id="input-preview" class="preview" onclick="document.getElementById('file-input').click()">
+                Drag and drop image here
+              </div>
+              <input type="file" id="file-input" accept="image/*" style="display: none">
+            </div>
+      
+            <div class="preview-box">
+              <h3>Output Image</h3>
+              <div id="output-preview" class="preview" style="border: 3px solid #cbd5e0; background: white;">
+                No output yet
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div id="imageModal" class="modal" onclick="closeModal()">
+          <div class="history-container">
+            <div id="history">
+            </div>
+          </div>
+
+          <div id="imageModal" class="modal" onclick="closeModal()">
+          </div>
         </div>
     
           <script>
