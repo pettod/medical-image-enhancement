@@ -2,6 +2,10 @@ from bottle import Bottle, request, static_file
 import os
 from PIL import Image
 import argparse
+from deblur import deblur
+from denoise import denoise
+from segment import segment
+from edge_detection import edgeDetection
 
 # Parse command line arguments
 parser = argparse.ArgumentParser()
@@ -42,23 +46,14 @@ def handle_button():
 
     print(button_name)
     if file_name and os.path.exists(f"uploads/{file_name}"):
-        rotation = 0
         if button_name == "Denoise":
-            rotation = 90
+            denoise(f"uploads/{file_name}")
         elif button_name == "Deblur":
-            rotation = 180
-        elif button_name == "Super Resolve":
-            rotation = -90
+            deblur(f"uploads/{file_name}")
+        elif button_name == "Edge Detection":
+            edgeDetection(f"uploads/{file_name}")
         elif button_name == "Segment":
-            rotation = -90
-
-        # Open and rotate the image
-        img_path = f"uploads/{file_name}"
-        with Image.open(img_path) as img:
-            # Rotate 90 degrees clockwise
-            rotated = img.rotate(rotation, expand=True)
-            # Save rotated image
-            rotated.save(img_path)
+            segment(f"uploads/{file_name}")
             
         # Return the rotated image
         response = static_file(file_name, root='uploads', mimetype='image/jpeg')

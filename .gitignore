@@ -15,3 +15,6 @@
 *.dcm
 *.nii
 *.nii.gz
+*.pem
+*.pyc
+*.DS_Store
