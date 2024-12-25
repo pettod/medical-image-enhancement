@@ -16,14 +16,14 @@ def segment(image_path, output_path=None):
     for i in range(1, masks.max()+1):
         # Get mask for current object
         mask = masks == i
-        
-        # For each channel
-        for c in range(3):
-            # Calculate mean intensity within mask
-            mean_intensity = np.mean(img[mask, c])
-            
-            # Apply mean intensity to masked region
-            output[mask, c] = mean_intensity
+
+        # Apply different colors per channel
+        # Red channel - invert
+        output[mask, 0] = 255 - np.mean(img[mask, 0])
+        # Green channel - enhance
+        output[mask, 1] = min(255, np.mean(img[mask, 1]) * 1.5)
+        # Blue channel - reduce 
+        output[mask, 2] = max(0, np.mean(img[mask, 2]) * 0.7)
 
     # Add alpha channel for transparency
     output_rgba = np.zeros((output.shape[0], output.shape[1], 4), dtype=output.dtype)
