@@ -642,6 +642,12 @@
             alert('Please upload an image first');
             return;
           }
+
+          // Show loading animation in output preview
+          const loadingDiv = document.createElement('div');
+          loadingDiv.className = 'loading';
+          loadingDiv.innerHTML = '<div class="loading-spinner"></div>';
+          outputPreview.appendChild(loadingDiv);
     
           fetch('/button-click', {
             method: 'POST',
@@ -675,6 +681,12 @@
               translateY = 0;
               initZoomPan();
               updateTransform();
+
+              // Remove loading animation after image is loaded
+              const loadingElement = outputPreview.querySelector('.loading');
+              if (loadingElement) {
+                loadingElement.remove();
+              }
             };
 
             // Store the output image URL in historyImages array
@@ -684,6 +696,11 @@
           .catch(error => {
             console.error('Error:', error);
             alert('An error occurred during the button click.');
+            // Remove loading animation on error
+            const loadingElement = outputPreview.querySelector('.loading');
+            if (loadingElement) {
+              loadingElement.remove();
+            }
           });
         }
       </script>
