@@ -2,9 +2,15 @@
 
 ## Introduction
 
+## Install
+
+```bash
+conda install pytorch=2.3.1 torchvision=0.18.1a0
+pip install -r requirements.txt
+```
+
 ## How to run
 
-1. `pip install -r requirements.txt`
 1. `python backend.py`
 1. Open `http://localhost:8080/` in your browser
 
