@@ -97,6 +97,10 @@
       pointer-events: none;
     }
 
+    .preview img.overlay {
+      opacity: 0.5;
+    }
+
     .buttons button {
       padding: 14px 24px;
       border: none;
@@ -114,10 +118,20 @@
       box-sizing: border-box;
     }
 
+    .buttons button:last-child {
+      background: #10b981;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+    }
+
     .buttons button:hover {
       background: #1d4ed8;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .buttons button:last-child:hover {
+      background: #059669;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
 
     .buttons button:active {
@@ -269,6 +283,7 @@
       <button onclick="buttonClick('Deblur')">Deblur</button>
       <button onclick="buttonClick('Edge Detection')">Edge Detection</button>
       <button onclick="buttonClick('Segment')">Segment</button>
+      <button onclick="toggleOverlay()">Toggle Overlay</button>
     </div>
 
     <div class="main-content">
@@ -314,6 +329,7 @@
         let currentFileName = null;
         let operationHistory = [];
         let historyImages = [];
+        let isOverlayActive = false;
     
         // Shared transform state
         let scale = 1;
@@ -328,6 +344,32 @@
         let initialY = 0;
         let touchStartDist = 0;
         let touchStartScale = scale;
+
+        function toggleOverlay() {
+          if (!currentFileName) {
+            alert('Please upload an image first');
+            return;
+          }
+
+          const outputImg = outputPreview.querySelector('img');
+          if (!outputImg) {
+            alert('Please process an image first');
+            return;
+          }
+
+          isOverlayActive = !isOverlayActive;
+          
+          if (isOverlayActive) {
+            const overlayImg = outputImg.cloneNode(true);
+            overlayImg.classList.add('overlay');
+            inputPreview.appendChild(overlayImg);
+          } else {
+            const overlayImg = inputPreview.querySelector('img.overlay');
+            if (overlayImg) {
+              overlayImg.remove();
+            }
+          }
+        }
 
         function updateHistory(operation) {
           operationHistory.push(operation);
@@ -490,9 +532,10 @@
         // Update the CSS transform property for both images
         function updateTransform() {
           [inputPreview, outputPreview].forEach(preview => {
-            const img = preview.querySelector('img');
-            if (!img) return;
-            img.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            const imgs = preview.querySelectorAll('img');
+            imgs.forEach(img => {
+              img.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            });
           });
         }
     
@@ -686,6 +729,14 @@
               const loadingElement = outputPreview.querySelector('.loading');
               if (loadingElement) {
                 loadingElement.remove();
+              }
+
+              // Update overlay if active
+              if (isOverlayActive) {
+                const overlayImg = inputPreview.querySelector('img.overlay');
+                if (overlayImg) {
+                  overlayImg.src = url;
+                }
               }
             };
 
