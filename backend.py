@@ -1,7 +1,7 @@
 from bottle import Bottle, request, static_file
 import os
-from PIL import Image
 import argparse
+
 from deblur import deblur
 from denoise import denoise
 from segment import segment
