@@ -11,7 +11,7 @@
           margin: 0;
           display: flex;
           min-height: 100vh;
-          background: #fafafa;
+          background: white;
           color: #1a1a1a;
           width: 100%;
           overflow-x: hidden;
@@ -22,7 +22,7 @@
           flex-direction: column;
           gap: 16px;
           padding: 24px;
-          background: #ffffff;
+          background: #efefef;
           border-right: 1px solid #f0f0f0;
           width: 240px;
           flex-shrink: 0;
@@ -58,7 +58,7 @@
         .preview {
           width: 100%;
           aspect-ratio: 1;
-          border: 2px dashed #e5e5e5;
+          border: 4px dashed #e5e5e5;
           border-radius: 16px;
           display: flex;
           align-items: center;
@@ -180,7 +180,7 @@
           align-items: center;
           position: relative;
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-          border: 1px solid #f0f0f0;
+          border: 2px solid #f0f0f0;
           box-sizing: border-box;
         }
 
@@ -201,11 +201,11 @@
         .history-box:not(:last-child)::after {
           content: '';
           position: absolute;
-          right: -24px;
+          right: -26px;
           top: 50%;
           width: 24px;
           height: 2px;
-          background: #e5e5e5;
+          background: #f0f0f0;
         }
 
         .modal {
@@ -264,7 +264,7 @@
       
             <div class="preview-box">
               <h3>Output Image</h3>
-              <div id="output-preview" class="preview" style="border: 3px solid #cbd5e0; background: white;">
+              <div id="output-preview" class="preview" style="border: 2px solid #cbd5e0; background: white;">
                 No output yet
               </div>
             </div>
