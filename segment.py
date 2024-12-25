@@ -1,28 +1,52 @@
-import cv2
 import numpy as np
+from cellpose import models
+from PIL import Image
 
 
-def contour_segmentation(input_path):
-    # Load the image
-    img = cv2.imread(input_path)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def segment(image_path, output_path=None):
+    img = np.array(Image.open(image_path))
+    model = models.Cellpose(model_type='cyto')
 
-    # Apply binary thresholding
-    _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    # Run Cellpose to get masks
+    out = model.eval(img, diameter=None, channels=[0,0])
+    masks = out[0]
 
-    # Find contours
-    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # For each detected cell/object
+    output = np.zeros_like(img)
+    for i in range(1, masks.max()+1):
+        # Get mask for current object
+        mask = masks == i
+        
+        # For each channel
+        for c in range(3):
+            # Calculate mean intensity within mask
+            mean_intensity = np.mean(img[mask, c])
+            
+            # Apply mean intensity to masked region
+            output[mask, c] = mean_intensity
 
-    # Create an empty segmentation map
-    segmentation_map = np.zeros_like(gray)
+    # Add alpha channel for transparency
+    output_rgba = np.zeros((output.shape[0], output.shape[1], 4), dtype=output.dtype)
+    output_rgba[..., :3] = output
+    output_rgba[..., 3] = 255  # Set fully opaque by default
+    
+    # Make zero values transparent
+    zero_mask = np.all(output == 0, axis=2)
+    output_rgba[zero_mask, 3] = 0
+    output = output_rgba
 
-    # Draw each contour with a unique color (here, different intensity)
-    for i, contour in enumerate(contours):
-        cv2.drawContours(segmentation_map, [contour], -1, (i * 20), -1)
-
-    # Save the segmented image
-    cv2.imwrite(input_path, segmentation_map)
+    if output_path:
+        Image.fromarray(output).save(output_path)
+    else:
+        Image.fromarray(output).save(image_path)
 
 
-def segment(input_path):
-    contour_segmentation(input_path)
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        print("Usage: python segment.py <input_image_path>")
+        sys.exit(1)
+        
+    input_path = sys.argv[1]
+    output_path = input_path.rsplit('.', 1)[0] + '_segmented.' + input_path.rsplit('.', 1)[1]
+    denoised = segment(input_path, output_path)
