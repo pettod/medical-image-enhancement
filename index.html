@@ -22,7 +22,7 @@
           flex-direction: column;
           gap: 16px;
           padding: 24px;
-          background: #efefef;
+          background: #f2f2f2;
           border-right: 1px solid #f0f0f0;
           width: 240px;
           flex-shrink: 0;
@@ -69,22 +69,12 @@
           background: #ffffff;
           overflow: hidden;
           position: relative;
-          cursor: grab;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
           box-sizing: border-box;
         }
     
         .preview:active {
           cursor: grabbing;
-        }
-    
-        #input-preview {
-          cursor: pointer;
-        }
-    
-        #input-preview:hover {
-          border-color: #2563eb;
-          background: #f8faff;
         }
     
         #input-preview.dragover {
@@ -256,8 +246,14 @@
           <div class="preview-container">
             <div class="preview-box">
               <h3>Input Image</h3>
-              <div id="input-preview" class="preview" onclick="document.getElementById('file-input').click()">
-                Drag and drop image here
+              <div id="input-preview" class="preview">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 15V18C19 18.5304 18.7893 19.0391 18.4142 19.4142C18.0391 19.7893 17.5304 20 17 20H7C6.46957 20 5.96086 19.7893 5.58579 19.4142C5.21071 19.0391 5 18.5304 5 18V15M12 4V15M12 4L8 8M12 4L16 8" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span style="text-align: center; line-height: 1.7">Drag and drop image here<br>
+                  or <span style="color: #2563eb; cursor: pointer; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" onclick="document.getElementById('file-input').click()">browse computer</span></span>
+                </div>
               </div>
               <input type="file" id="file-input" accept="image/*" style="display: none">
             </div>
