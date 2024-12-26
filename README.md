@@ -5,7 +5,9 @@
 ## Install
 
 ```bash
-conda install pytorch=2.3.1 torchvision=0.18.1a0
+conda create -n cell python=3.10.16
+conda activate cell
+conda install pytorch=2.3.1 torchvision
 pip install -r requirements.txt
 ```
 
