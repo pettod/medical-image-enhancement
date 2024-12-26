@@ -1,11 +1,15 @@
 import numpy as np
 from cellpose import models
 from PIL import Image
+import torch
+
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 
 def segment(image_path, output_path=None):
     img = np.array(Image.open(image_path))
-    model = models.Cellpose(model_type='cyto3')
+    model = models.Cellpose(model_type='cyto3', device=DEVICE)
 
     # Run Cellpose to get masks
     out = model.eval(img, diameter=None, channels=[0,0])
