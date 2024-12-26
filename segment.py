@@ -26,19 +26,20 @@ def segment(image_path, output_path=None):
         output[mask, 2] = max(0, np.mean(img[mask, 2]) * 0.7)
 
     # Add alpha channel for transparency
-    output_rgba = np.zeros((output.shape[0], output.shape[1], 4), dtype=output.dtype)
-    output_rgba[..., :3] = output
-    output_rgba[..., 3] = 255  # Set fully opaque by default
+    if image_path.endswith('.png'):
+        output_rgba = np.zeros((output.shape[0], output.shape[1], 4), dtype=output.dtype)
+        output_rgba[..., :3] = output
+        output_rgba[..., 3] = 255  # Set fully opaque by default
     
-    # Make zero values transparent
-    zero_mask = np.all(output == 0, axis=2)
-    output_rgba[zero_mask, 3] = 0
-    output = output_rgba
+        # Make zero values transparent
+        zero_mask = np.all(output == 0, axis=2)
+        output_rgba[zero_mask, 3] = 0
+        output = output_rgba
 
     if output_path:
         Image.fromarray(output).save(output_path)
     else:
-        Image.fromarray(output).save(image_path.rsplit('.', 1)[0] + '.png')
+        Image.fromarray(output).save(image_path)
 
 
 if __name__ == "__main__":
@@ -48,5 +49,5 @@ if __name__ == "__main__":
         sys.exit(1)
         
     input_path = sys.argv[1]
-    output_path = input_path.rsplit('.', 1)[0] + '_segmented.png'
-    denoised = segment(input_path, output_path)
+    output_path = input_path.rsplit('.', 1)[0] + '_segmented.' + input_path.rsplit('.', 1)[1]
+    segment(input_path, output_path)
