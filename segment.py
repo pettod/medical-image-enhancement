@@ -5,7 +5,7 @@ from PIL import Image
 
 def segment(image_path, output_path=None):
     img = np.array(Image.open(image_path))
-    model = models.Cellpose(model_type='cyto')
+    model = models.Cellpose(model_type='cyto3')
 
     # Run Cellpose to get masks
     out = model.eval(img, diameter=None, channels=[0,0])
