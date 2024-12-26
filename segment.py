@@ -20,14 +20,7 @@ def segment(image_path, output_path=None):
     for i in range(1, masks.max()+1):
         # Get mask for current object
         mask = masks == i
-
-        # Apply different colors per channel
-        # Red channel - invert
-        output[mask, 0] = 255 - np.mean(img[mask, 0])
-        # Green channel - enhance
-        output[mask, 1] = min(255, np.mean(img[mask, 1]) * 1.5)
-        # Blue channel - reduce 
-        output[mask, 2] = max(0, np.mean(img[mask, 2]) * 0.7)
+        colorMask(mask, img, i, output, different_colors=True)
 
     # Add alpha channel for transparency
     if image_path.endswith('.png'):
@@ -44,6 +37,45 @@ def segment(image_path, output_path=None):
         Image.fromarray(output).save(output_path)
     else:
         Image.fromarray(output).save(image_path)
+
+
+def colorMask(mask, img, i, output, different_colors=False):
+    if different_colors:
+        # Calculate mean intensity of the image in the mask region
+        mask_mean = np.mean(img[mask])
+        
+        # Choose base colors that contrast with mean intensity
+        if mask_mean < 128:
+            # For darker regions, use bright colors with random variation
+            base_color = (
+                np.random.randint(200, 256),  # red component
+                np.random.randint(200, 256),  # green component
+                np.random.randint(200, 256)   # blue component
+            )
+        else:
+            # For brighter regions, use darker colors with random variation
+            base_color = (
+                np.random.randint(0, 180),  # red component
+                np.random.randint(0, 180),  # green component 
+                np.random.randint(0, 180)   # blue component
+            )
+            
+        # Add small random variations to each color channel
+        r = min(255, max(0, base_color[0] + np.random.randint(-20, 21)))
+        g = min(255, max(0, base_color[1] + np.random.randint(-20, 21)))
+        b = min(255, max(0, base_color[2] + np.random.randint(-20, 21)))
+        
+        output[mask, 0] = r
+        output[mask, 1] = g 
+        output[mask, 2] = b
+    else:
+        # Apply different colors per channel
+        # Red channel - invert
+        output[mask, 0] = 255 - np.mean(img[mask, 0])
+        # Green channel - enhance
+        output[mask, 1] = min(255, np.mean(img[mask, 1]) * 1.5)
+        # Blue channel - reduce 
+        output[mask, 2] = max(0, np.mean(img[mask, 2]) * 0.7)
 
 
 if __name__ == "__main__":
