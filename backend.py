@@ -10,10 +10,12 @@ from edge_detection import edgeDetection
 # Parse command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--global', default=None, action='store_true', help='Use 0.0.0.0 instead of localhost')
+parser.add_argument('--port', default=8080, type=int, help='Port to run the server on')
 args = parser.parse_args()
 
 # Set host based on args
 HOST = '0.0.0.0' if getattr(args, 'global') else 'localhost'
+PORT = args.port
 
 app = Bottle()
 
@@ -68,4 +70,4 @@ if not os.path.exists('uploads'):
 
 # Run the server
 if __name__ == '__main__':
-    app.run(host=HOST, port=8080, debug=True)
+    app.run(host=HOST, port=PORT, debug=True)
