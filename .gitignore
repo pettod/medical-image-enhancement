@@ -18,3 +18,5 @@
 *.pem
 *.pyc
 *.DS_Store
+*.tif
+*.tiff
