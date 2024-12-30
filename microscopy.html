@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI scientist</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            margin: 40px 0;
+        }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI scientist</h1>
+
+        <div class="progress-text">
+            <h2>Summary</h2>
+            <p>
+                In just 4 days after forming up a team, we ideated, designed, and successfully implemented the core functionality of our microscopy image processing platform.
+                The platform applies deep learning algorithms to improve the quality of microscopy images.
+                Ultimately, this platform will analyze microscopy images ‒ e.g. ratio of M1/M2 macrophages ‒ without scientists having to strain their eyes.
+            </p>
+        </div>
+
+        <div class="video-container">
+            <video controls>
+                <source src="quick_demo.mov" type="video/quicktime">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <p style="text-align: center; margin-top: -20px; color: #ffffff;">
+            Quick demo of the microscopy image processing platform showing segmentation and overlay features.
+        </p>
+
+        <div class="progress-text">
+            <h2>Product Features</h2>
+            <ul>
+                <li>Drag and drop Web UI</li>
+                <li>Denoising, deblurring, edge detection, segmentation</li>
+                <li>Synchronized zooming</li>
+                <li>Image processing pipeline</li>
+                <li>Hosting on AWS</li>
+                <li>Domain name setup</li>
+            </ul>
+            
+            <h2>Test the product</h2>
+            <p>The product is running live on <a style="color: #73c2ff;" href="http://rauha.co.uk/test">http://rauha.co.uk/test</a></p>
+        </div>
+    </div>
+</body>
+</html>
