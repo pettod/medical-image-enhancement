@@ -20,7 +20,7 @@ PORT = args.port
 app = Bottle()
 
 # Serve static files (HTML, CSS, JS)
-@app.route('/')
+@app.route('/test')
 def serve_index():
     return static_file('index.html', root='.')
 
