@@ -24,7 +24,7 @@ pip install -r requirements.txt
 1. cd medical-image-enhancement/
 1. conda activate cell
 1. curl ifconfig.me
-1. sudo /home/ubuntu/anaconda3/envs/cell/bin/python backend.py --global --port 80
+1. sudo /home/ubuntu/anaconda3/envs/cell/bin/python backend.py --global --port 8080
 
 
 ## Setup AWS
