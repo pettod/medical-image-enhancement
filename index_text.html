@@ -249,7 +249,7 @@
               // Send to backend
               if (currentFileName) {
                 const formData = new FormData();
-                formData.append('text_prompt', message);
+                formData.append('message', message);
                 formData.append('filename', currentFileName);
                 
                 fetch('/message', {

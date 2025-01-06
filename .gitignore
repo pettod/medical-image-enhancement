@@ -30,3 +30,5 @@
 *.m4v
 *.mpg
 *.mpeg
+
+.vscode

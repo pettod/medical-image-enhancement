@@ -27,12 +27,13 @@ def serve_index():
 # Handle chat messages
 @app.route('/message', method='POST')
 def handle_message():
-    data = request.json
+    data = request.forms
     message = data.get('message')
+    filename = data.get('filename')
     if message:
         # Here you would process the message and generate a response
         # For now just echo back the message
-        return {"response": message}
+        return {"message": message}
     return {"error": "No message received"}
 
 # Handle file uploads
