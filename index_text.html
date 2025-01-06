@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microscopy Image Enhancement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+      background: white;
+      color: #1a1a1a;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .preview-container {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 24px;
+      box-sizing: border-box;
+    }
+
+    .preview-box {
+      flex: 1;
+      min-width: 320px;
+      max-width: 480px;
+    }
+
+    .preview-box h3 {
+      color: #1a1a1a;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .preview {
+      width: 100%;
+      aspect-ratio: 1;
+      border: 4px dashed #e5e5e5;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666666;
+      font-size: 1rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #ffffff;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+    }
+
+    .preview:active {
+      cursor: grabbing;
+    }
+
+    #input-preview.dragover {
+      border-color: #2563eb;
+      background: #f8faff;
+      transform: scale(1.01);
+    }
+
+    .preview img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      transform-origin: center center;
+      max-width: none;
+      max-height: none;
+      cursor: grab;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .preview img.overlay {
+      opacity: 0.5;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 0;
+      min-width: 0;
+    }
+
+    .chat-container {
+      width: 320px;
+      background: white;
+      border-left: 1px solid #e5e5e5;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-message {
+      background: #f3f4f6;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      max-width: 80%;
+      align-self: flex-end;
+    }
+
+    .chat-message.received {
+      background: #e5e7eb;
+      align-self: flex-start;
+    }
+
+    .chat-input-container {
+      border-top: 1px solid #e5e5e5;
+      padding: 16px;
+      background: white;
+    }
+
+    .chat-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e5e5;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+      resize: none;
+      box-sizing: border-box;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    /* Loading animation styles */
+    .loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      border-radius: 16px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+    <div class="main-content">
+      <div class="preview-container">
+        <div class="preview-box">
+          <h3>Input Image</h3>
+          <div id="input-preview" class="preview">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 16L12 12M12 12L8 16M12 12V21M20.39 18.39C21.3653 17.8583 22.1358 17.0169 22.5799 15.9986C23.024 14.9804 23.1162 13.8432 22.8422 12.7667C22.5682 11.6901 21.9434 10.7355 21.0666 10.0534C20.1898 9.37138 19.1108 9.00073 18 9H16.74C16.4373 7.82924 15.8732 6.74233 15.0899 5.82099C14.3067 4.89965 13.3248 4.16785 12.2181 3.68061C11.1114 3.19336 9.90856 2.96336 8.70012 3.00788C7.49169 3.05241 6.30907 3.3703 5.24118 3.93766C4.17329 4.50503 3.24792 5.3071 2.53463 6.28358C1.82134 7.26006 1.33871 8.38554 1.12299 9.57539C0.907278 10.7653 0.964111 11.9885 1.28923 13.1533C1.61435 14.318 2.19926 15.3939 3.00001 16.3" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span style="text-align: center; line-height: 1.7">Drag and drop an image<br>
+              or <span style="color: #2563eb; cursor: pointer; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" onclick="document.getElementById('file-input').click()">browse computer</span></span>
+              <span style="color: #666666; text-align: center; font-size: 0.8em; line-height: 1.7;">(.png, .jpg, max 5MB)</span>
+            </div>
+          </div>
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display: none">
+        </div>
+  
+        <div class="preview-box">
+          <h3>Output Image</h3>
+          <div id="output-preview" class="preview" style="border: 2px solid #cbd5e0; background: white;">
+            No output yet
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages">
+        <!-- Messages will be added here -->
+      </div>
+      <div class="chat-input-container">
+        <textarea id="text-prompt" class="chat-input" placeholder="Type your message..." rows="3"></textarea>
+      </div>
+    </div>
+
+      <script>
+        const inputPreview = document.getElementById('input-preview');
+        const outputPreview = document.getElementById('output-preview');
+        const fileInput = document.getElementById('file-input');
+        const textPrompt = document.getElementById('text-prompt');
+        const chatMessages = document.getElementById('chat-messages');
+    
+        let currentFileName = null;
+        let isOverlayActive = false;
+    
+        // Add event listener for Enter key
+        textPrompt.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const message = textPrompt.value.trim();
+            if (message) {
+              // Add message to chat
+              const messageDiv = document.createElement('div');
+              messageDiv.className = 'chat-message';
+              messageDiv.textContent = message;
+              chatMessages.appendChild(messageDiv);
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+
+              // Clear input
+              textPrompt.value = '';
+
+              // Send to backend
+              if (currentFileName) {
+                const formData = new FormData();
+                formData.append('text_prompt', message);
+                formData.append('filename', currentFileName);
+                
+                fetch('/message', {
+                  method: 'POST',
+                  body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                  // Add received message to chat
+                  const receivedDiv = document.createElement('div');
+                  receivedDiv.className = 'chat-message received';
+                  receivedDiv.textContent = data.message;
+                  chatMessages.appendChild(receivedDiv);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+                  
+                  // Display the output image
+                  if (data.image) {
+                    const outputImg = document.createElement('img');
+                    outputImg.src = data.image;
+                    outputPreview.innerHTML = '';
+                    outputPreview.appendChild(outputImg);
+                    
+                    // Reset transform values
+                    scale = minScale;
+                    translateX = 0;
+                    translateY = 0;
+                    updateTransform();
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  alert('An error occurred while sending the message.');
+                });
+              }
+            }
+          }
+        });
+
+        // Shared transform state
+        let scale = 1;
+        let minScale = 1;
+        const maxScale = 3;
+        let translateX = 0;
+        let translateY = 0;
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+        let initialX = 0;
+        let initialY = 0;
+        let touchStartDist = 0;
+        let touchStartScale = scale;
+    
+        // Function to initialize zoom and pan for both image elements
+        function initZoomPan() {
+          const imgs = [inputPreview.querySelector('img'), outputPreview.querySelector('img')];
+          imgs.forEach(img => {
+            if (!img) return;
+            // Disable default drag behavior on image
+            img.onmousedown = (e) => e.preventDefault();
+          });
+    
+          // Handle wheel for zooming
+          [inputPreview, outputPreview].forEach(preview => {
+            preview.addEventListener('wheel', function(e) {
+              e.preventDefault();
+              const delta = -e.deltaY;
+              const zoomFactor = delta > 0 ? 1.01 : 0.99;
+              let newScale = scale * zoomFactor;
+              newScale = Math.min(Math.max(newScale, minScale), maxScale);
+              if (newScale === scale) return;
+    
+              // Calculate the mouse position relative to the image
+              const img = preview.querySelector('img');
+              if (!img) return;
+              const rect = img.getBoundingClientRect();
+              const offsetX = e.clientX - rect.left;
+              const offsetY = e.clientY - rect.top;
+              const dx = (offsetX / rect.width - 0.5) * (newScale - scale);
+              const dy = (offsetY / rect.height - 0.5) * (newScale - scale);
+    
+              scale = newScale;
+              translateX -= dx * rect.width;
+              translateY -= dy * rect.height;
+    
+              constrainPan();
+              updateTransform();
+            });
+    
+            // Handle mousedown for panning
+            preview.addEventListener('mousedown', function(e) {
+              e.preventDefault();
+              isPanning = true;
+              startX = e.clientX;
+              startY = e.clientY;
+              initialX = translateX;
+              initialY = translateY;
+              preview.style.cursor = 'grabbing';
+            });
+    
+            // Handle mousemove for panning
+            preview.addEventListener('mousemove', function(e) {
+              if (!isPanning) return;
+              const dx = e.clientX - startX;
+              const dy = e.clientY - startY;
+              translateX = initialX + dx;
+              translateY = initialY + dy;
+              constrainPan();
+              updateTransform();
+            });
+    
+            // Handle mouseup and mouseleave to stop panning
+            ['mouseup', 'mouseleave'].forEach(event => {
+              preview.addEventListener(event, function() {
+                isPanning = false;
+                preview.style.cursor = 'grab';
+              });
+            });
+    
+            // Touch events for mobile devices
+            preview.addEventListener('touchstart', function(e) {
+              if (e.touches.length === 1) {
+                isPanning = true;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                initialX = translateX;
+                initialY = translateY;
+              } else if (e.touches.length === 2) {
+                isPanning = false;
+                touchStartDist = getDistance(e.touches);
+                touchStartScale = scale;
+              }
+            });
+    
+            preview.addEventListener('touchmove', function(e) {
+              e.preventDefault();
+              if (e.touches.length === 1 && isPanning) {
+                const dx = e.touches[0].clientX - startX;
+                const dy = e.touches[0].clientY - startY;
+                translateX = initialX + dx;
+                translateY = initialY + dy;
+                constrainPan();
+                updateTransform();
+              } else if (e.touches.length === 2) {
+                const currentDist = getDistance(e.touches);
+                let zoomFactor = currentDist / touchStartDist;
+                let newScale = touchStartScale * zoomFactor;
+                newScale = Math.min(Math.max(newScale, minScale), maxScale);
+                if (newScale === scale) return;
+    
+                scale = newScale;
+                constrainPan();
+                updateTransform();
+              }
+            }, { passive: false });
+    
+            preview.addEventListener('touchend', function(e) {
+              if (e.touches.length < 2) {
+                touchStartDist = 0;
+              }
+              if (e.touches.length === 0) {
+                isPanning = false;
+              }
+            });
+          });
+        }
+    
+        function getDistance(touches) {
+          const dx = touches[0].clientX - touches[1].clientX;
+          const dy = touches[0].clientY - touches[1].clientY;
+          return Math.sqrt(dx * dx + dy * dy);
+        }
+    
+        // Update the CSS transform property for both images
+        function updateTransform() {
+          [inputPreview, outputPreview].forEach(preview => {
+            const imgs = preview.querySelectorAll('img');
+            imgs.forEach(img => {
+              img.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            });
+          });
+        }
+    
+        // Constrain the panning so that the image stays within the preview boundaries
+        function constrainPan() {
+          [inputPreview, outputPreview].forEach(preview => {
+            const img = preview.querySelector('img');
+            if (!img) return;
+            const rect = img.getBoundingClientRect();
+            const previewRect = preview.getBoundingClientRect();
+    
+            const imgWidth = rect.width;
+            const imgHeight = rect.height;
+            const previewWidth = previewRect.width;
+            const previewHeight = previewRect.height;
+    
+            // Calculate the maximum translation
+            const maxTranslateX = (imgWidth - previewWidth) / 2;
+            const maxTranslateY = (imgHeight - previewHeight) / 2;
+    
+            // If the image is smaller than the preview, center it
+            if (imgWidth * scale <= previewWidth) {
+              translateX = 0;
+            } else {
+              translateX = Math.min(Math.max(translateX, -maxTranslateX), maxTranslateX);
+            }
+    
+            if (imgHeight * scale <= previewHeight) {
+              translateY = 0;
+            } else {
+              translateY = Math.min(Math.max(translateY, -maxTranslateY), maxTranslateY);
+            }
+          });
+        }
+    
+        // Drag and drop handlers
+        inputPreview.addEventListener('dragover', (event) => {
+          event.preventDefault();
+          inputPreview.classList.add('dragover');
+        });
+    
+        inputPreview.addEventListener('dragleave', () => {
+          inputPreview.classList.remove('dragover');
+        });
+    
+        fileInput.addEventListener('change', (event) => {
+          const file = event.target.files[0];
+          handleFile(file);
+        });
+    
+        inputPreview.addEventListener('drop', (event) => {
+          event.preventDefault();
+          inputPreview.classList.remove('dragover');
+    
+          const files = event.dataTransfer.files;
+          if (files.length > 0) {
+            handleFile(files[0]);
+          }
+        });
+    
+        // Handle file upload and display
+        function handleFile(file) {
+          if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file');
+            return;
+          }
+    
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('text_prompt', textPrompt.value);
+          
+          currentFileName = file.name;
+
+          // Show loading animation
+          const loadingDiv = document.createElement('div');
+          loadingDiv.className = 'loading';
+          loadingDiv.innerHTML = '<div class="loading-spinner"></div>';
+          inputPreview.appendChild(loadingDiv);
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const imgInput = document.createElement('img');
+            imgInput.src = e.target.result;
+            inputPreview.innerHTML = '';
+            inputPreview.appendChild(imgInput);
+    
+            const imgOutput = document.createElement('img');
+            outputPreview.innerHTML = '';
+            outputPreview.appendChild(imgOutput);
+    
+            imgInput.onload = () => {
+              const imgNaturalWidth = imgInput.naturalWidth;
+              const imgNaturalHeight = imgInput.naturalHeight;
+              const previewWidth = inputPreview.clientWidth;
+              const previewHeight = inputPreview.clientHeight;
+    
+              const scaleX = previewWidth / imgNaturalWidth;
+              const scaleY = previewHeight / imgNaturalHeight;
+              scale = Math.min(scaleX, scaleY);
+              minScale = scale;
+              translateX = 0;
+              translateY = 0;
+              initZoomPan();
+              updateTransform();
+
+              // Remove loading animation after image is loaded
+              const loadingElement = inputPreview.querySelector('.loading');
+              if (loadingElement) {
+                loadingElement.remove();
+              }
+            };
+          };
+          reader.readAsDataURL(file);
+    
+          fetch('/upload', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            // Display the output image if it exists in the response
+            if (data.image) {
+              const outputImg = document.createElement('img');
+              outputImg.src = data.image;
+              outputPreview.innerHTML = '';
+              outputPreview.appendChild(outputImg);
+              
+              // Reset transform values
+              scale = minScale;
+              translateX = 0;
+              translateY = 0;
+              updateTransform();
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during the upload.');
+            inputPreview.innerHTML = 'Drag and drop image here';
+            outputPreview.innerHTML = 'No output yet';
+            currentFileName = null;
+            scale = 1;
+            minScale = 1;
+            translateX = 0;
+            translateY = 0;
+
+            // Remove loading animation on error
+            const loadingElement = inputPreview.querySelector('.loading');
+            if (loadingElement) {
+              loadingElement.remove();
+            }
+          });
+        }
+      </script>
+
+</body>
+</html>
