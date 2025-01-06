@@ -35,10 +35,14 @@ def handle_message():
             segment(f"uploads/{filename}")
             response = {
                 "image": filename,
-                "message": "Here's the segmented image"
+                "message": "Here's the segmented image. Anything else?"
             }
+        elif "statistics" in message:
+            response = {"message": "Here are the statistics: 78 cells. The segmented area of the cells is 1231 pixels which equals to 78.4% cell density."}
+        elif "hi" in message:
+            response = {"message": "Hello! How can I help you today?"}
         else:
-            response = {"message": message}
+            response = {"message": "Sorry, I don't understand. Please ask me something else."}
         return response
     return {"error": "No message received"}
 
