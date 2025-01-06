@@ -32,13 +32,21 @@ def handle_message():
     filename = data.get('filename')
     if message:
         if "segment" in message:
-            segment(f"uploads/{filename}")
+            print("Message:", message)
+            if "nucleau" in message:
+                print("Segmenting nucleus")
+                segment(f"uploads/{filename}", channels=[3,0])
+            elif "cytoplasm" in message:
+                print("Segmenting cytoplasm")
+                segment(f"uploads/{filename}", channels=[0,0])
+            else:
+                response = {"message": "Please specify whether you want to segment the nucleus or the cytoplasm."}
             response = {
                 "image": filename,
                 "message": "Here's the segmented image. Anything else?"
             }
         elif "statistics" in message:
-            response = {"message": "Here are the statistics: 78 cells. The segmented area of the cells is 1231 pixels which equals to 78.4% cell density."}
+            response = {"message": "The statistics are as follows: 78 cells were identified, with a total segmented area of 1231 pixels, corresponding to a cell density of 78.4%."}
         elif "hi" in message:
             response = {"message": "Hello! How can I help you today?"}
         else:

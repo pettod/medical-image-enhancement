@@ -7,12 +7,12 @@ import torch
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # else "mps" if torch.backends.mps.is_available()
 
 
-def segment(image_path, output_path=None):
+def segment(image_path, output_path=None, channels=[0, 0]):
     img = np.array(Image.open(image_path))
     model = models.Cellpose(model_type='cyto3', device=DEVICE)
 
     # Run Cellpose to get masks
-    out = model.eval(img, diameter=None, channels=[0,0])
+    out = model.eval(img, diameter=None, channels=channels)
     masks = out[0]
 
     # For each detected cell/object
