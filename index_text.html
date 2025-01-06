@@ -154,6 +154,12 @@
       border-color: #2563eb;
     }
 
+    .chat-input:disabled {
+      background: #f3f4f6;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
     /* Loading animation styles */
     .loading {
       position: absolute;
@@ -216,7 +222,7 @@
         <!-- Messages will be added here -->
       </div>
       <div class="chat-input-container">
-        <textarea id="text-prompt" class="chat-input" placeholder="Type your message..." rows="3"></textarea>
+        <textarea id="text-prompt" class="chat-input" placeholder="Type your message..." rows="3" disabled></textarea>
       </div>
     </div>
 
@@ -501,6 +507,7 @@
           formData.append('text_prompt', textPrompt.value);
           
           currentFileName = file.name;
+          textPrompt.disabled = false; // Enable text input when image is uploaded
 
           // Show loading animation
           const loadingDiv = document.createElement('div');
@@ -573,6 +580,7 @@
             minScale = 1;
             translateX = 0;
             translateY = 0;
+            textPrompt.disabled = true; // Disable text input on error
 
             // Remove loading animation on error
             const loadingElement = inputPreview.querySelector('.loading');
