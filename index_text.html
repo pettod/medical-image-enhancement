@@ -226,6 +226,28 @@
         transform: translateY(-4px);
       }
     }
+
+    /* Overlay button styles */
+    .overlay-button {
+      padding: 12px 24px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 20px;
+    }
+
+    .overlay-button:hover {
+      background: #1d4ed8;
+    }
+
+    .overlay-button.active {
+      background: #1e40af;
+    }
   </style>
 </head>
 <body>
@@ -253,6 +275,8 @@
           </div>
         </div>
       </div>
+
+      <button id="overlay-button" class="overlay-button">Toggle Overlay</button>
     </div>
 
     <div class="chat-container">
@@ -270,9 +294,31 @@
         const fileInput = document.getElementById('file-input');
         const textPrompt = document.getElementById('text-prompt');
         const chatMessages = document.getElementById('chat-messages');
+        const overlayButton = document.getElementById('overlay-button');
     
         let currentFileName = null;
         let isOverlayActive = false;
+
+        // Add overlay button click handler
+        overlayButton.addEventListener('click', () => {
+          isOverlayActive = !isOverlayActive;
+          overlayButton.classList.toggle('active');
+          
+          const outputImg = outputPreview.querySelector('img');
+          if (outputImg) {
+            const clonedImg = outputImg.cloneNode(true);
+            clonedImg.classList.add('overlay');
+            
+            if (isOverlayActive) {
+              inputPreview.appendChild(clonedImg);
+            } else {
+              const overlayImg = inputPreview.querySelector('img.overlay');
+              if (overlayImg) {
+                overlayImg.remove();
+              }
+            }
+          }
+        });
     
         // Add event listener for Enter key
         textPrompt.addEventListener('keydown', function(e) {
