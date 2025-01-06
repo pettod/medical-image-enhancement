@@ -188,6 +188,44 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* Typing indicator styles */
+    .typing-indicator {
+      background: #e5e7eb;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      max-width: 80%;
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: #666666;
+      border-radius: 50%;
+      animation: typing-bounce 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing-bounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-4px);
+      }
+    }
   </style>
 </head>
 <body>
@@ -247,6 +285,17 @@
               messageDiv.className = 'chat-message';
               messageDiv.textContent = message;
               chatMessages.appendChild(messageDiv);
+
+              // Add typing indicator
+              const typingDiv = document.createElement('div');
+              typingDiv.className = 'typing-indicator';
+              typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              `;
+              chatMessages.appendChild(typingDiv);
+              
               chatMessages.scrollTop = chatMessages.scrollHeight;
 
               // Clear input
@@ -264,6 +313,9 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                  // Remove typing indicator
+                  typingDiv.remove();
+
                   // Add received message to chat
                   const receivedDiv = document.createElement('div');
                   receivedDiv.className = 'chat-message received';
@@ -286,6 +338,9 @@
                   }
                 })
                 .catch(error => {
+                  // Remove typing indicator
+                  typingDiv.remove();
+
                   console.error('Error:', error);
                   alert('An error occurred while sending the message.');
                 });
