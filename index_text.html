@@ -268,7 +268,7 @@
                   // Display the output image
                   if (data.image) {
                     const outputImg = document.createElement('img');
-                    outputImg.src = data.image;
+                    outputImg.src = `/uploads/${data.image}`;
                     outputPreview.innerHTML = '';
                     outputPreview.appendChild(outputImg);
                     

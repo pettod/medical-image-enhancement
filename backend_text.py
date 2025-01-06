@@ -31,10 +31,21 @@ def handle_message():
     message = data.get('message')
     filename = data.get('filename')
     if message:
-        # Here you would process the message and generate a response
-        # For now just echo back the message
-        return {"message": message}
+        if "segment" in message:
+            segment(f"uploads/{filename}")
+            response = {
+                "image": filename,
+                "message": "Here's the segmented image"
+            }
+        else:
+            response = {"message": message}
+        return response
     return {"error": "No message received"}
+
+# Serve the file from the uploads directory
+@app.route('/uploads/<filename>')
+def serve_file(filename):
+    return static_file(filename, root='uploads', mimetype='image/jpeg')
 
 # Handle file uploads
 @app.route('/upload', method='POST')
@@ -56,22 +67,22 @@ def handle_upload():
 def handle_button():
     data = request.json
     button_name = data.get('button_name')
-    file_name = data.get('file_name')
+    filename = data.get('filename')
 
     print(button_name)
-    if file_name and os.path.exists(f"uploads/{file_name}"):
+    if filename and os.path.exists(f"uploads/{filename}"):
         if button_name == "Denoise":
-            denoise(f"uploads/{file_name}")
+            denoise(f"uploads/{filename}")
         elif button_name == "Deblur":
-            deblur(f"uploads/{file_name}")
+            deblur(f"uploads/{filename}")
         elif button_name == "Edge Detection":
-            edgeDetection(f"uploads/{file_name}")
+            edgeDetection(f"uploads/{filename}")
         elif button_name == "Segment":
-            segment(f"uploads/{file_name}")
+            segment(f"uploads/{filename}")
             
         # Return the rotated image
-        response = static_file(file_name, root='uploads', mimetype='image/jpeg')
-        #os.remove(f"uploads/{file_name}")
+        response = static_file(filename, root='uploads', mimetype='image/jpeg')
+        #os.remove(f"uploads/{filename}")
         return response
     else:
         return {"message": f"File not found"}
