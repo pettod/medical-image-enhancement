@@ -15,6 +15,9 @@ def segment(image_path, output_path=None, channels=[0, 0]):
     out = model.eval(img, diameter=None, channels=channels)
     masks = out[0]
 
+    # Get mask statistics
+    mask_stats = getMaskStats(masks)
+
     # For each detected cell/object
     output = np.zeros_like(img)
     for i in range(1, masks.max()+1):
@@ -37,6 +40,20 @@ def segment(image_path, output_path=None, channels=[0, 0]):
         Image.fromarray(output).save(output_path)
     else:
         Image.fromarray(output).save(image_path)
+
+    return mask_stats
+
+
+def getMaskStats(masks):
+    """Returns number of masks and total area in pixels"""
+    num_masks = masks.max()
+    total_area = np.sum(masks > 0)
+    average_area = total_area / num_masks
+    return {
+        "number_of_masks": num_masks,
+        "total_area": total_area,
+        "average_area": average_area,
+    }
 
 
 def colorMask(mask, img, i, output, different_colors=False):

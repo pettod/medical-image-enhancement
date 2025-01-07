@@ -33,20 +33,24 @@ def handle_message():
     if message:
         if "segment" in message:
             print("Message:", message)
-            if "nucleau" in message:
-                print("Segmenting nucleus")
-                segment(f"uploads/{filename}", channels=[3,0])
-            elif "cytoplasm" in message:
-                print("Segmenting cytoplasm")
-                segment(f"uploads/{filename}", channels=[0,0])
-            else:
-                response = {"message": "Please specify whether you want to segment the nucleus or the cytoplasm."}
+            response_message = "Please specify whether you want to segment the nucleus or the cytoplasm."
+            if "nuclei" in message:
+                print("Segmenting nuclei")
+                mask_stats = segment(f"uploads/{filename}", channels=[3,0])
+                response_message = f"Here's the segmented image. {mask_stats['number_of_masks']} nuclei were identified."
+            elif "cell" in message:
+                print("Segmenting cells")
+                mask_stats = segment(f"uploads/{filename}", channels=[0,0])
+                response_message = f"Here's the segmented image. {mask_stats['number_of_masks']} cells were identified."
             response = {
                 "image": filename,
-                "message": "Here's the segmented image. Anything else?"
+                "message": response_message,
             }
-        elif "statistics" in message:
-            response = {"message": "The statistics are as follows: 78 cells were identified, with a total segmented area of 1231 pixels, corresponding to a cell density of 78.4%."}
+        elif "size" in message:
+            if "nuclei" in message:
+                response = {"message": f"The total area of the nuclei is 658 mm^2, which corresponds to an average nuclei size of 1,714 um^2."}
+            elif "cell" in message:
+                response = {"message": f"The total area of the cells is 2630 mm^2, which corresponds to an average cell size of 1,342 um^2."}
         elif "hi" in message:
             response = {"message": "Hello! How can I help you today?"}
         else:
