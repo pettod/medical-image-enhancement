@@ -362,12 +362,25 @@
                   // Remove typing indicator
                   typingDiv.remove();
 
-                  // Add received message to chat
+                  // Add received message to chat with word-by-word animation
                   const receivedDiv = document.createElement('div');
                   receivedDiv.className = 'chat-message received';
-                  receivedDiv.textContent = data.message;
                   chatMessages.appendChild(receivedDiv);
-                  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                  // Split message into words and animate
+                  const words = data.message.split(' ');
+                  let wordIndex = 0;
+                  
+                  function showNextWord() {
+                    if (wordIndex < words.length) {
+                      receivedDiv.textContent += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
+                      wordIndex++;
+                      chatMessages.scrollTop = chatMessages.scrollHeight;
+                      setTimeout(showNextWord, 100); // Adjust timing between words here
+                    }
+                  }
+
+                  showNextWord();
                   
                   // Display the output image
                   if (data.image) {
@@ -691,6 +704,5 @@
           });
         }
       </script>
-
 </body>
 </html>
