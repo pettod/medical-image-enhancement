@@ -384,8 +384,9 @@
                   
                   // Display the output image
                   if (data.image) {
+                    const timestamp = new Date().getTime();
                     const outputImg = document.createElement('img');
-                    outputImg.src = `/uploads/${data.image}`;
+                    outputImg.src = `/uploads/${data.image}?t=${timestamp}`;
                     outputPreview.innerHTML = '';
                     outputPreview.appendChild(outputImg);
                     
