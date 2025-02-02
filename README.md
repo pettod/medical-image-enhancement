@@ -1,6 +1,6 @@
 # Medical Image Enchancement
 
-![Demo](https://github.com/user-attachments/assets/19562dab-f550-4f52-bb0f-8f4f2009ca8e)
+<video src='https://github.com/user-attachments/assets/19562dab-f550-4f52-bb0f-8f4f2009ca8e' width=540/></video>
 
 ## Install
 
