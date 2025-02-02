@@ -1,6 +1,11 @@
 # Medical Image Enchancement
 
-<video src='https://github.com/user-attachments/assets/19562dab-f550-4f52-bb0f-8f4f2009ca8e' width=540/></video>
+<video autoplay loop muted playsinline width=540>
+    <source src="https://github.com/user-attachments/assets/19562dab-f550-4f52-bb0f-8f4f2009ca8e" type="video/quicktime">
+    <source src="https://github.com/user-attachments/assets/19562dab-f550-4f52-bb0f-8f4f2009ca8e" type="video/mp4">
+    <source src="https://github.com/user-attachments/assets/19562dab-f550-4f52-bb0f-8f4f2009ca8e" type="video/webm">
+    Your browser does not support the video tag.
+</video>
 
 ## Install
 
